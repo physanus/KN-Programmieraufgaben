@@ -47,6 +47,6 @@ public class KryproManager {
         Main.LOGGER.info("Successfully generated the keypair.");
         return keyGen.generateKeyPair();
     }
-    
+
 
 }
