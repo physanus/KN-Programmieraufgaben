@@ -11,5 +11,3 @@ bin
 .project
 .settings
 org.eclipse.jdt.core.prefs
-/lib/TCore.jar
-dependencies/BungeeCord.jar
