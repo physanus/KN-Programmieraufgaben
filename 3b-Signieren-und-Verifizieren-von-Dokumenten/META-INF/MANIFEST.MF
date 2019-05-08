@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: de.danielprinz.hskl.nk.signierenUndVerifizierenVonDokument
+ en.Main
+
