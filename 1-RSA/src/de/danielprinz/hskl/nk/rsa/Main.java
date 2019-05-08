@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.logging.*;
 
 public class Main {
@@ -53,7 +55,7 @@ public class Main {
         });
         consoleHandler.setLevel(LOG_LEVEL);
         LOGGER.addHandler(consoleHandler);
-        
+
 
         try {
             KeyPair keyPair = KryproManager.getFreshKeyPair(2048);
@@ -62,6 +64,15 @@ public class Main {
 
             String decrypted = KryproManager.decrypt(keyPair.getPrivate(), encrypted);
             System.out.println("decrypted: " + decrypted);
+
+            RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
+            RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
+
+            // TODO
+            System.out.println(rsaPublicKey.getModulus());
+            System.out.println(rsaPublicKey.getPublicExponent());
+            System.out.println(rsaPrivateKey.getPrivateExponent());
+
         } catch (NoSuchAlgorithmException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | BadPaddingException e) {
             e.printStackTrace();
         }
