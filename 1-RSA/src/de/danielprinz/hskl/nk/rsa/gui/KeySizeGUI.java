@@ -64,12 +64,11 @@ public class KeySizeGUI {
 
             int keysize = Integer.parseInt(keysizeTextField.getText());
 
-            // TODO show popup
             if(keysize < 512) {
-                keysizeTextField.setText("512");
+                AlertBox.display("Fehler", "The keysize must be greater than or equal 512 Bit");
                 return;
             } else if(keysize > 16384) {
-                keysizeTextField.setText("16384");
+                AlertBox.display("Fehler", "The keysize must be less than or equal 16384 Bit");
                 return;
             }
 

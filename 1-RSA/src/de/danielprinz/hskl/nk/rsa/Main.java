@@ -231,7 +231,7 @@ public class Main extends Application {
 
                     } catch (ArrayIndexOutOfBoundsException | NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e1) {
                         e1.printStackTrace();
-                        AlertBox.display("Fehler", "Einer deiner Keys scheint kaputt zu sein.\nPrüfe bitte deren Korrektheit!");
+                        AlertBox.display("Fehler", "One of the keys seems to be broken.\nPlease, check their correctness!");
                     }
 
 
@@ -299,45 +299,6 @@ public class Main extends Application {
             buttons.add(generateButton);
 
         }
-
-        /*authenticate.setOnAction((ActionEvent e) -> {
-            if(textFields.get(0).getText().equals("")) {
-                AlertBox.display("Fehler: Startpunkt fehlt", "Bitte gib einen Startpunk an, bevor du eine Route planst!");
-                return;
-            }
-            if(textFields.get(1).getText().equals("")) {
-                AlertBox.display("Fehler: Zielort fehlt", "Bitte gib mindestens einen Zielort ein!");
-                return;
-            }
-
-            authenticate.setDisable(true);
-            for(TextField textField : textFields) textField.setDisable(true);
-            menuBar.setDisable(true);
-            ArrayList<String> waypoints = new ArrayList<>(textFields.stream().map(TextInputControl::getText).filter(s -> !s.equals("")).collect(Collectors.toList()));
-
-            new Thread(() -> {
-
-                try {
-
-                    ArrayList<RouteContainer> cheapestRoutes = GoogleAPI.analyze(waypoints);
-                    Platform.runLater(() -> {
-                        RouteViewer.display(cheapestRoutes);
-                        releaseUILocks();
-                    });
-
-                } catch (IOException | InterruptedException | ApiException e1) {
-                    Platform.runLater(() -> AlertBox.display("Fehler: Verbindung", "Es konnte keine Verbindung hergestellt werden!"));
-                    e1.printStackTrace();
-                    Platform.runLater(() -> {
-                        releaseUILocks();
-                    });
-                    return;
-                }
-
-            }).start();
-
-
-        });*/
 
         // Add everything to grid
         grid.getChildren().addAll(labels);
