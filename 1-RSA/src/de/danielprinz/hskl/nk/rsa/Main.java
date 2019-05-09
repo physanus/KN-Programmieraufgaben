@@ -1,6 +1,6 @@
 package de.danielprinz.hskl.nk.rsa;
 
-import de.danielprinz.hskl.nk.rsa.crypto.KryproManager;
+import de.danielprinz.hskl.nk.rsa.crypto.KryptoManager;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -9,8 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.logging.*;
 
 public class Main {
@@ -28,6 +27,7 @@ public class Main {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
+
 
     public static void main(String[] args) {
 
@@ -55,23 +55,79 @@ public class Main {
         });
         consoleHandler.setLevel(LOG_LEVEL);
         LOGGER.addHandler(consoleHandler);
+        LOGGER.setLevel(LOG_LEVEL);
 
 
         try {
-            KeyPair keyPair = KryproManager.getFreshKeyPair(2048);
-            byte[] encrypted = KryproManager.encrypt(keyPair.getPublic(), "Top Secret message");
-            System.out.println("encrypted: " + new String(encrypted, StandardCharsets.UTF_8));
 
-            String decrypted = KryproManager.decrypt(keyPair.getPrivate(), encrypted);
-            System.out.println("decrypted: " + decrypted);
+            String plaintext = "Top Secret message";
+            int keysize = 2048;
 
-            RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
-            RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
 
-            // TODO
-            System.out.println(rsaPublicKey.getModulus());
-            System.out.println(rsaPublicKey.getPublicExponent());
-            System.out.println(rsaPrivateKey.getPrivateExponent());
+            /*
+             * ENCRYPTION
+             */
+
+
+            LOGGER.info("ENCRYPTION");
+
+            KeyPair keyPair = KryptoManager.getFreshKeyPair(keysize);
+            byte[] encryptedEncryption = KryptoManager.encrypt(keyPair.getPublic(), plaintext);
+            LOGGER.info("encryptedEncryption: " + Arrays.toString(encryptedEncryption));
+            LOGGER.info("encryptedEncryption: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
+
+            String decryptedEncryption = KryptoManager.decrypt(keyPair.getPrivate(), encryptedEncryption);
+            LOGGER.info("decryptedEncryption: " + decryptedEncryption + "\n");
+
+            // p, q, e and n, phi, d calculation
+            // BigInteger p = KryptoManager.getP(keyPair.getPublic());
+            // BigInteger q = KryptoManager.getQ(keyPair.getPrivate());
+            // BigInteger e = KryptoManager.getE(keyPair.getPublic());
+            // BigInteger n = p.multiply(q);
+            // BigInteger phi = p.subtract(BigInteger.valueOf(1)).multiply(q.subtract(BigInteger.valueOf(1)));
+            // BigInteger d = e.modInverse(phi);
+            // LOGGER.fine("p   = " + p);
+            // LOGGER.fine("q   = " + q);
+            // LOGGER.fine("e   = " + e);
+            // LOGGER.fine("n   = " + n);
+            // LOGGER.fine("phi = " + phi);
+            // LOGGER.fine("d   = " + d);
+
+
+            /*
+             * NORMAL AUTHENTICATION
+             */
+
+            LOGGER.info("NORMAL AUTHENTICATION");
+
+            KeyPair senderNormalAuthentication = KryptoManager.getFreshKeyPair(keysize);
+
+            byte[] encryptedNormalAuthentication = KryptoManager.encrypt(senderNormalAuthentication.getPrivate(), plaintext);
+            LOGGER.info("encryptedNormalAuthentication: " + Arrays.toString(encryptedEncryption));
+            LOGGER.info("encryptedNormalAuthentication: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
+
+            String decryptedNormalAuthentication = KryptoManager.decrypt(senderNormalAuthentication.getPublic(), encryptedNormalAuthentication);
+            LOGGER.info("decryptedNormalAuthentication: " + decryptedNormalAuthentication + "\n");
+
+
+            /*
+             * FALSE AUTHENTICATION
+             */
+
+            LOGGER.info("FALSE AUTHENTICATION");
+
+            KeyPair senderFalseAuthentication = KryptoManager.getFreshKeyPair(keysize);
+            KeyPair receiverFalseAutehntication = KryptoManager.getFreshKeyPair(keysize);
+
+            byte[] encryptedFalseAuthentication = KryptoManager.encrypt(senderFalseAuthentication.getPrivate(), plaintext);
+            LOGGER.info("encryptedFalseAuthentication: " + Arrays.toString(encryptedEncryption));
+            LOGGER.info("encryptedFalseAuthentication: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
+
+            String decryptedFalseAuthentication = KryptoManager.decrypt(receiverFalseAutehntication.getPublic(), encryptedFalseAuthentication);
+            LOGGER.info("decryptedFalseAuthentication: " + decryptedFalseAuthentication);
+
+
+
 
         } catch (NoSuchAlgorithmException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | BadPaddingException e) {
             e.printStackTrace();
