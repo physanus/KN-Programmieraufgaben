@@ -104,8 +104,10 @@ public class KeySizeGUI {
 
             File selectedFile = fileChooser.showSaveDialog(window);
 
-            window.close();
-            Main.generateKeyPairGUI(keysize, i, selectedFile);
+            if(selectedFile != null) {
+                window.close();
+                Main.generateKeyPairGUI(keysize, i, selectedFile);
+            }
 
 
         });
