@@ -55,6 +55,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
 
+        // set up the logger
         for(Handler handler : LOGGER.getParent().getHandlers()) {
             LOGGER.getParent().removeHandler(handler);
         }
@@ -92,33 +93,7 @@ public class Main extends Application {
     private static ArrayList<Label> labels;
     private static ArrayList<TextField> textFields;
     private static ArrayList<Button> buttons;
-    private static Button authenticate;
-    private static Button encrypt;
 
-    public static void generateKeyPairGUI(int keysize, int i, File file) {
-        try {
-            KeyPair keyPair = KryptoManager.getFreshKeyPair(keysize);
-
-            String publicKey = Arrays.toString(keyPair.getPublic().getEncoded());
-            String privateKey = Arrays.toString(keyPair.getPrivate().getEncoded());
-
-            String keyString = publicKey + "; " + privateKey;
-
-            LOGGER.info("generated " + labels.get(i).getText() + ": " + keyString);
-            textFields.get(i).setText(keyString);
-
-            if(file != null) {
-                try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
-                    out.print(keyString);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -239,6 +214,7 @@ public class Main extends Application {
                         KeyPair keyPairSender = KryptoManager.getKeysFromString(textFields.get(0).getText());
                         KeyPair keyPairReceiver = KryptoManager.getKeysFromString(textFields.get(1).getText());
 
+                        // randomize whether the authentication should be successful or not (MITM-Attack)
                         boolean correctAuthentication = ThreadLocalRandom.current().nextBoolean();
 
                         byte[] encryptedAuthentication = KryptoManager.encrypt(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
@@ -260,6 +236,7 @@ public class Main extends Application {
 
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e1) {
                         e1.printStackTrace();
+                        AlertBox.display("Fehler", "One of the keys seems to be broken.\nPlease, check their correctness!");
                     }
 
                 });
@@ -312,8 +289,7 @@ public class Main extends Application {
             });
 
             buttons.add(importButton);
-
-
+            
 
             if (i == 0) {
                 title = "Generate KeyPair Sender";
@@ -325,13 +301,7 @@ public class Main extends Application {
             GridPane.setConstraints(generateButton, 3, i);
 
             int finalI = i;
-            generateButton.setOnAction(e -> {
-
-                KeySizeGUI.display(finalI);
-                //KryptoManager.getFreshKeyPair();
-
-            });
-
+            generateButton.setOnAction(e -> KeySizeGUI.display(finalI));
             buttons.add(generateButton);
 
         }
@@ -349,87 +319,36 @@ public class Main extends Application {
     }
 
 
+    /**
+     * Fetches a new KeySet, inputs it into the GUI and saves it to the file if specified
+     * @param keysize The size of the key which should be generated, range: 512-16385
+     * @param i The no of the textfield being triggered on
+     * @param file The file where the keys should be saved to OR null if the keys should not be saved
+     */
+    public static void generateKeyPairGUI(int keysize, int i, File file) {
+        try {
+            KeyPair keyPair = KryptoManager.getFreshKeyPair(keysize);
 
+            String publicKey = Arrays.toString(keyPair.getPublic().getEncoded());
+            String privateKey = Arrays.toString(keyPair.getPrivate().getEncoded());
 
+            String keyString = publicKey + "; " + privateKey;
 
+            LOGGER.info("generated " + labels.get(i).getText() + ": " + keyString);
+            textFields.get(i).setText(keyString);
 
+            if(file != null) {
+                try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
+                    out.print(keyString);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
 
-
-    //        try {
-//
-//            String plaintext = "Top Secret message";
-//            int keysize = 2048;
-//
-//
-//            /*
-//             * ENCRYPTION
-//             */
-//
-//
-//            LOGGER.info("ENCRYPTION");
-//
-//            KeyPair keyPair = KryptoManager.getFreshKeyPair(keysize);
-//            byte[] encryptedEncryption = KryptoManager.encrypt(keyPair.getPublic(), plaintext);
-//            LOGGER.info("encryptedEncryption: " + Arrays.toString(encryptedEncryption));
-//            LOGGER.info("encryptedEncryption: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
-//
-//            String decryptedEncryption = KryptoManager.decrypt(keyPair.getPrivate(), encryptedEncryption);
-//            LOGGER.info("decryptedEncryption: " + decryptedEncryption + "\n");
-//
-//            // p, q, e and n, phi, d calculation
-//            // BigInteger p = KryptoManager.getP(keyPair.getPublic());
-//            // BigInteger q = KryptoManager.getQ(keyPair.getPrivate());
-//            // BigInteger e = KryptoManager.getE(keyPair.getPublic());
-//            // BigInteger n = p.multiply(q);
-//            // BigInteger phi = p.subtract(BigInteger.valueOf(1)).multiply(q.subtract(BigInteger.valueOf(1)));
-//            // BigInteger d = e.modInverse(phi);
-//            // LOGGER.fine("p   = " + p);
-//            // LOGGER.fine("q   = " + q);
-//            // LOGGER.fine("e   = " + e);
-//            // LOGGER.fine("n   = " + n);
-//            // LOGGER.fine("phi = " + phi);
-//            // LOGGER.fine("d   = " + d);
-//
-//
-//            /*
-//             * NORMAL AUTHENTICATION
-//             */
-//
-//            LOGGER.info("NORMAL AUTHENTICATION");
-//
-//            KeyPair senderNormalAuthentication = KryptoManager.getFreshKeyPair(keysize);
-//
-//            byte[] encryptedNormalAuthentication = KryptoManager.encrypt(senderNormalAuthentication.getPrivate(), plaintext);
-//            LOGGER.info("encryptedNormalAuthentication: " + Arrays.toString(encryptedEncryption));
-//            LOGGER.info("encryptedNormalAuthentication: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
-//
-//            String decryptedNormalAuthentication = KryptoManager.decrypt(senderNormalAuthentication.getPublic(), encryptedNormalAuthentication);
-//            LOGGER.info("decryptedNormalAuthentication: " + decryptedNormalAuthentication + "\n");
-//
-//
-//            /*
-//             * FALSE AUTHENTICATION
-//             */
-//
-//            LOGGER.info("FALSE AUTHENTICATION");
-//
-//            KeyPair senderFalseAuthentication = KryptoManager.getFreshKeyPair(keysize);
-//            KeyPair receiverFalseAutehntication = KryptoManager.getFreshKeyPair(keysize);
-//
-//            byte[] encryptedFalseAuthentication = KryptoManager.encrypt(senderFalseAuthentication.getPrivate(), plaintext);
-//            LOGGER.info("encryptedFalseAuthentication: " + Arrays.toString(encryptedEncryption));
-//            LOGGER.info("encryptedFalseAuthentication: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
-//
-//            String decryptedFalseAuthentication = KryptoManager.decrypt(receiverFalseAutehntication.getPublic(), encryptedFalseAuthentication);
-//            LOGGER.info("decryptedFalseAuthentication: " + decryptedFalseAuthentication);
-//
-//
-//
-//
-//        } catch (NoSuchAlgorithmException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | BadPaddingException e) {
-//            e.printStackTrace();
-//        }
-
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 

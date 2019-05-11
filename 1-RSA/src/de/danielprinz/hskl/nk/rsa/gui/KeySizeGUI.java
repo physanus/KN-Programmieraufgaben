@@ -20,7 +20,11 @@ public class KeySizeGUI {
 
     private static Button generate;
 
-    public static <a> void display(int i) {
+    /**
+     * Displays a GUI for selection of the keysize and a file to save the generated keys to
+     * @param i The no of the textfield being triggered on
+     */
+    public static void display(int i) {
 
         Stage window = new Stage();
         window.setTitle("Select Keysize");

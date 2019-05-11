@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 public class AlertBox {
 
     /**
-     * Display an alert box
+     * Displays an alert box
      * @param title The title of the box
      * @param message The message of the box
      */

@@ -18,6 +18,7 @@ import java.util.Arrays;
 
 public class KryptoManager {
 
+    // Define a secure random for better randomized keys
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     static {
@@ -25,12 +26,34 @@ public class KryptoManager {
     }
 
 
+    /**
+     * Encrypts a given String using the provided key, either private (for authentication) or public (for encryption)
+     * @param key The private or public key
+     * @param msg The String to be encrypted
+     * @return The encrypted byte-Array
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     * @throws InvalidKeyException
+     */
     public static byte[] encrypt(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
         Cipher rsaCipher = Cipher.getInstance("RSA/ECB/NoPadding");
         rsaCipher.init(Cipher.ENCRYPT_MODE, key);
         return rsaCipher.doFinal(msg.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * Decrypts a given String using the provided key, either private (for encryption) or public (for authentication)
+     * @param key The private or public key
+     * @param msg The String to be decrypted
+     * @return The decrypted String, UTF-8 encoded
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
     public static String decrypt(Key key, byte[] msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher rsaCipher = Cipher.getInstance("RSA/ECB/NoPadding");
         rsaCipher.init(Cipher.DECRYPT_MODE , key);
@@ -39,9 +62,9 @@ public class KryptoManager {
     }
 
     /**
-     * Generates a fresh, random pair of private and public RSA key
-     * @param keysize The size of the key which should be generated
-     * @return The keypair
+     * Generates a fresh, random pair of private and public RSA keys
+     * @param keysize The size of the key which should be generated, range: 512-16385
+     * @return The generated keypair
      * @throws NoSuchAlgorithmException
      */
     public static KeyPair getFreshKeyPair(int keysize) throws NoSuchAlgorithmException {
@@ -55,11 +78,18 @@ public class KryptoManager {
         return keyGen.generateKeyPair();
     }
 
-
+    /**
+     * Retrieves the keys from the resective String-representation
+     * @param keyString The String to be retrieved
+     * @return The KeyPair [private & public key included]
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
     public static KeyPair getKeysFromString(String keyString) throws NoSuchAlgorithmException, InvalidKeySpecException {
         String[] keyPublic = keyString.split("; ")[0].replaceAll("\\[", "").replaceAll("]", "").split(", ");
         String[] keyPrivate = keyString.split("; ")[1].replaceAll("\\[", "").replaceAll("]", "").split(", ");
 
+        // convert String to bytes
         byte[] keyPublicBytes = new byte[keyPublic.length];
         for(int j = 0; j < keyPublic.length; j++) {
             keyPublicBytes[j] = Byte.valueOf(keyPublic[j]);
@@ -72,7 +102,7 @@ public class KryptoManager {
         }
         Main.LOGGER.info("Found private key bytes: " + Arrays.toString(keyReceiverPrivateBytes));
 
-
+        // convert bytes to keys
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 
         X509EncodedKeySpec x509EncodedKeySpecPublic = new X509EncodedKeySpec(keyPublicBytes);

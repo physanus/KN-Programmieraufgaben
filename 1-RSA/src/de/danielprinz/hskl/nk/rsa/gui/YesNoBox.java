@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 public class YesNoBox {
 
     /**
-     * Display a yes-no box
+     * Displays a yes-no box
      * @param title The title of the box
      * @param message The message of the box
      * @param yes The runnable for the yes-option
