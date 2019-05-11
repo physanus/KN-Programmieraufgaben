@@ -11,6 +11,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 public class KryptoManager {
 
@@ -49,6 +53,36 @@ public class KryptoManager {
         keyGen.initialize(keysize, SECURE_RANDOM);
         Main.LOGGER.info("Successfully generated the keypair.");
         return keyGen.generateKeyPair();
+    }
+
+
+    public static KeyPair getKeysFromString(String keyString) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        String[] keyPublic = keyString.split("; ")[0].replaceAll("\\[", "").replaceAll("]", "").split(", ");
+        String[] keyPrivate = keyString.split("; ")[1].replaceAll("\\[", "").replaceAll("]", "").split(", ");
+
+        byte[] keyPublicBytes = new byte[keyPublic.length];
+        for(int j = 0; j < keyPublic.length; j++) {
+            keyPublicBytes[j] = Byte.valueOf(keyPublic[j]);
+        }
+        Main.LOGGER.info("Found public key bytes: " + Arrays.toString(keyPublicBytes));
+
+        byte[] keyReceiverPrivateBytes = new byte[keyPrivate.length];
+        for(int j = 0; j < keyPrivate.length; j++) {
+            keyReceiverPrivateBytes[j] = Byte.valueOf(keyPrivate[j]);
+        }
+        Main.LOGGER.info("Found private key bytes: " + Arrays.toString(keyReceiverPrivateBytes));
+
+
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+        X509EncodedKeySpec x509EncodedKeySpecPublic = new X509EncodedKeySpec(keyPublicBytes);
+        PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpecPublic);
+
+        PKCS8EncodedKeySpec pkcs8EncodedKeySpecPrivate = new PKCS8EncodedKeySpec(keyReceiverPrivateBytes);
+        PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpecPrivate);
+
+
+        return new KeyPair(publicKey, privateKey);
     }
 
 

@@ -19,13 +19,17 @@ import javafx.stage.Stage;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.*;
 
 public class Main extends Application {
@@ -91,7 +95,7 @@ public class Main extends Application {
     private static Button authenticate;
     private static Button encrypt;
 
-    public static void generateKeyPairGUI(int keysize, int i) {
+    public static void generateKeyPairGUI(int keysize, int i, File file) {
         try {
             KeyPair keyPair = KryptoManager.getFreshKeyPair(keysize);
 
@@ -102,6 +106,14 @@ public class Main extends Application {
 
             LOGGER.info("generated " + labels.get(i).getText() + ": " + keyString);
             textFields.get(i).setText(keyString);
+
+            if(file != null) {
+                try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
+                    out.print(keyString);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
 
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -190,41 +202,17 @@ public class Main extends Application {
 
                     try {
 
-                        String keyReceiver = textFields.get(1).getText();
-                        String[] keyReceiverPublic = keyReceiver.split("; ")[0].replaceAll("\\[", "").replaceAll("]", "").split(", ");
-                        String[] keyReceiverPrivate = keyReceiver.split("; ")[1].replaceAll("\\[", "").replaceAll("]", "").split(", ");
-
-                        byte[] keyReceiverPublicBytes = new byte[keyReceiverPublic.length];
-                        for(int j = 0; j < keyReceiverPublic.length; j++) {
-                            keyReceiverPublicBytes[j] = Byte.valueOf(keyReceiverPublic[j]);
-                        }
-                        LOGGER.info("Found public key bytes: " + Arrays.toString(keyReceiverPublicBytes));
-
-                        byte[] keyReceiverPrivateBytes = new byte[keyReceiverPrivate.length];
-                        for(int j = 0; j < keyReceiverPrivate.length; j++) {
-                            keyReceiverPrivateBytes[j] = Byte.valueOf(keyReceiverPrivate[j]);
-                        }
-                        LOGGER.info("Found private key bytes: " + Arrays.toString(keyReceiverPrivateBytes));
-
-
-                        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-                        X509EncodedKeySpec x509EncodedKeySpecPublic = new X509EncodedKeySpec(keyReceiverPublicBytes);
-                        PublicKey publicKeyReceiver = keyFactory.generatePublic(x509EncodedKeySpecPublic);
-
-                        PKCS8EncodedKeySpec pkcs8EncodedKeySpecPrivate = new PKCS8EncodedKeySpec(keyReceiverPrivateBytes);
-                        PrivateKey privateKeyReceiver = keyFactory.generatePrivate(pkcs8EncodedKeySpecPrivate);
-
+                        KeyPair keyPairReceiver = KryptoManager.getKeysFromString(textFields.get(1).getText());
 
                         // encrypt
-                        byte[] encryptedEncryption = KryptoManager.encrypt(publicKeyReceiver, textFields.get(2).getText());
+                        byte[] encryptedEncryption = KryptoManager.encrypt(keyPairReceiver.getPublic(), textFields.get(2).getText());
                         LOGGER.info("encryptedEncryption: " + Arrays.toString(encryptedEncryption));
                         LOGGER.info("encryptedEncryption: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
                         textFields.get(3).setText(Arrays.toString(encryptedEncryption));
                         textFields.get(4).setText(new String(encryptedEncryption, StandardCharsets.UTF_8));
 
                         // decrypt
-                        String decryptedEncryption = KryptoManager.decrypt(privateKeyReceiver, encryptedEncryption);
+                        String decryptedEncryption = KryptoManager.decrypt(keyPairReceiver.getPrivate(), encryptedEncryption);
                         LOGGER.info("decryptedEncryption: " + decryptedEncryption + "\n");
                         textFields.get(5).setText(decryptedEncryption);
 
@@ -246,7 +234,33 @@ public class Main extends Application {
 
                 authenticateButton.setOnAction(e -> {
 
+                    try {
 
+                        KeyPair keyPairSender = KryptoManager.getKeysFromString(textFields.get(0).getText());
+                        KeyPair keyPairReceiver = KryptoManager.getKeysFromString(textFields.get(1).getText());
+
+                        boolean correctAuthentication = ThreadLocalRandom.current().nextBoolean();
+
+                        byte[] encryptedAuthentication = KryptoManager.encrypt(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
+                        LOGGER.info("encryptedAuthentication: " + Arrays.toString(encryptedAuthentication));
+                        LOGGER.info("encryptedAuthentication: " + new String(encryptedAuthentication, StandardCharsets.UTF_8));
+                        textFields.get(3).setText(Arrays.toString(encryptedAuthentication));
+                        textFields.get(4).setText(new String(encryptedAuthentication, StandardCharsets.UTF_8));
+
+                        String decryptedAuthentication = KryptoManager.decrypt(keyPairSender.getPublic(), encryptedAuthentication);
+                        LOGGER.info("decryptedAuthentication: " + decryptedAuthentication + "\n");
+                        textFields.get(5).setText(decryptedAuthentication);
+
+                        AlertBox.display("Info",
+                                "If the sender was authenticated successfully,\n" +
+                                        "the message in 'Decrypted' is readable\n" +
+                                        "Here: " + (correctAuthentication ? "Authenticated / readable" : "Not authenticated / not readable")
+                        );
+
+
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e1) {
+                        e1.printStackTrace();
+                    }
 
                 });
 
@@ -264,13 +278,36 @@ public class Main extends Application {
             GridPane.setConstraints(importButton, 2, i);
 
             String finalTitle = title;
+            int finalI1 = i;
             importButton.setOnAction(e -> {
 
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle(finalTitle);
-                fileChooser.showOpenDialog(window);
+                fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+                FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("DKLRSA (*.dklrsa)", "*.dklrsa");
+                fileChooser.getExtensionFilters().add(extensionFilter);
+                fileChooser.setSelectedExtensionFilter(extensionFilter);
 
-                // TODO
+                File selectedFile = fileChooser.showOpenDialog(window);
+                if(selectedFile == null) return;
+                if(!selectedFile.exists()) {
+                    AlertBox.display("Error", "The supplied file does not exist");
+                    return;
+                }
+
+                try {
+                    String keyString = new String(Files.readAllBytes(Paths.get(selectedFile.getAbsolutePath())));
+                    try {
+                        KryptoManager.getKeysFromString(keyString);
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException e1) {
+                        AlertBox.display("Error", "The key is invalid");
+                        return;
+                    }
+
+                    textFields.get(finalI1).setText(keyString);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
 
             });
 
@@ -287,11 +324,10 @@ public class Main extends Application {
             generateButton.setPrefWidth(155);
             GridPane.setConstraints(generateButton, 3, i);
 
-            String finalTitle1 = title;
             int finalI = i;
             generateButton.setOnAction(e -> {
 
-                KeySizeGUI.display(finalTitle1, finalI);
+                KeySizeGUI.display(finalI);
                 //KryptoManager.getFreshKeyPair();
 
             });
