@@ -261,7 +261,7 @@ public class Main extends Application {
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle(finalTitle);
                 fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
-                FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("DKLRSA (*.dklrsa)", "*.dklrsa");
+                FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("KNRSA (*.knrsa)", "*.knrsa");
                 fileChooser.getExtensionFilters().add(extensionFilter);
                 fileChooser.setSelectedExtensionFilter(extensionFilter);
 
@@ -289,7 +289,7 @@ public class Main extends Application {
             });
 
             buttons.add(importButton);
-            
+
 
             if (i == 0) {
                 title = "Generate KeyPair Sender";

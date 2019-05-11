@@ -102,7 +102,7 @@ public class KeySizeGUI {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select file");
             fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
-            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("DKLRSA (*.dklrsa)", "*.dklrsa");
+            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("KNRSA (*.knrsa)", "*.knrsa");
             fileChooser.getExtensionFilters().add(extensionFilter);
             fileChooser.setSelectedExtensionFilter(extensionFilter);
 
