@@ -2,7 +2,8 @@ package de.danielprinz.hskl.nk.rsa;
 
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
-import de.danielprinz.hskl.nk.rsa.crypto.KryptoManager;
+import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
+import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
 import de.danielprinz.hskl.nk.rsa.gui.AlertBox;
 import de.danielprinz.hskl.nk.rsa.gui.KeySizeGUI;
 import javafx.application.Application;
@@ -37,50 +38,13 @@ public class Main extends Application {
     // ICON src
     // https://www.flaticon.com/free-icon/unlocked_149463
 
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
-
-    public static final Logger LOGGER = Logger.getLogger("1-RSA");
-    private static final Level LOG_LEVEL = Level.ALL;
-
     private static Main instance;
-
+    private static LoggerUtil logger;
 
     public static void main(String[] args) {
 
-        // set up the logger
-        for(Handler handler : LOGGER.getParent().getHandlers()) {
-            LOGGER.getParent().removeHandler(handler);
-        }
-
-        ConsoleHandler consoleHandler = new ConsoleHandler();
-        consoleHandler.setFormatter(new Formatter() {
-            @Override
-            public String format(LogRecord record) {
-
-                String color;
-                if(record.getLevel().intValue() <= Level.CONFIG.intValue())
-                    color = ANSI_WHITE;
-                else if(record.getLevel().intValue() == Level.INFO.intValue())
-                    color = ANSI_PURPLE;
-                else if(record.getLevel().intValue() == Level.WARNING.intValue())
-                    color = ANSI_YELLOW;
-                else
-                    color = ANSI_RED;
-
-                return color + "[" + record.getLoggerName() + "] [" + record.getLevel().getName() + "] " + record.getMessage() + ANSI_RESET + "\n";
-            }
-        });
-        consoleHandler.setLevel(LOG_LEVEL);
-        LOGGER.addHandler(consoleHandler);
-        LOGGER.setLevel(LOG_LEVEL);
+        logger = LoggerUtil.getInstance();
+        logger.setPrefix("1-RSA");
 
         launch(args);
     }
@@ -181,14 +145,14 @@ public class Main extends Application {
 
                         // encrypt
                         byte[] encryptedEncryption = KryptoManager.encrypt(keyPairReceiver.getPublic(), textFields.get(2).getText());
-                        LOGGER.info("encryptedEncryption: " + Arrays.toString(encryptedEncryption));
-                        LOGGER.info("encryptedEncryption: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
+                        logger.log(Level.INFO, "encryptedEncryption: " + Arrays.toString(encryptedEncryption));
+                        logger.log(Level.INFO, "encryptedEncryption: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
                         textFields.get(3).setText(Arrays.toString(encryptedEncryption));
                         textFields.get(4).setText(new String(encryptedEncryption, StandardCharsets.UTF_8));
 
                         // decrypt
                         String decryptedEncryption = KryptoManager.decrypt(keyPairReceiver.getPrivate(), encryptedEncryption);
-                        LOGGER.info("decryptedEncryption: " + decryptedEncryption + "\n");
+                        logger.log(Level.INFO, "decryptedEncryption: " + decryptedEncryption + "\n");
                         textFields.get(5).setText(decryptedEncryption);
 
 
@@ -218,13 +182,13 @@ public class Main extends Application {
                         boolean correctAuthentication = ThreadLocalRandom.current().nextBoolean();
 
                         byte[] encryptedAuthentication = KryptoManager.encrypt(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
-                        LOGGER.info("encryptedAuthentication: " + Arrays.toString(encryptedAuthentication));
-                        LOGGER.info("encryptedAuthentication: " + new String(encryptedAuthentication, StandardCharsets.UTF_8));
+                        logger.log(Level.INFO, "encryptedAuthentication: " + Arrays.toString(encryptedAuthentication));
+                        logger.log(Level.INFO, "encryptedAuthentication: " + new String(encryptedAuthentication, StandardCharsets.UTF_8));
                         textFields.get(3).setText(Arrays.toString(encryptedAuthentication));
                         textFields.get(4).setText(new String(encryptedAuthentication, StandardCharsets.UTF_8));
 
                         String decryptedAuthentication = KryptoManager.decrypt(keyPairSender.getPublic(), encryptedAuthentication);
-                        LOGGER.info("decryptedAuthentication: " + decryptedAuthentication + "\n");
+                        logger.log(Level.INFO, "decryptedAuthentication: " + decryptedAuthentication + "\n");
                         textFields.get(5).setText(decryptedAuthentication);
 
                         AlertBox.display("Info",
@@ -334,7 +298,7 @@ public class Main extends Application {
 
             String keyString = publicKey + "; " + privateKey;
 
-            LOGGER.info("generated " + labels.get(i).getText() + ": " + keyString);
+            logger.log(Level.INFO, "generated " + labels.get(i).getText() + ": " + keyString);
             textFields.get(i).setText(keyString);
 
             if(file != null) {

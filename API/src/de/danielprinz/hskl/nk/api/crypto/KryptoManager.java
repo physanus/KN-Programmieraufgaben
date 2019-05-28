@@ -1,11 +1,6 @@
-package de.danielprinz.hskl.nk.rsa.crypto;
+package de.danielprinz.hskl.nk.api.crypto;
 
-import de.danielprinz.hskl.nk.rsa.Main;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
+import javax.crypto.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -15,6 +10,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 public class KryptoManager {
 
@@ -71,11 +67,24 @@ public class KryptoManager {
         if(keysize < 512) throw new IllegalArgumentException("Keysize must be greater than 512");
         if(keysize > 16384) throw new IllegalArgumentException("Keysize must be less than 16385");
 
-        Main.LOGGER.info("Generating " + keysize + " bit long keypair, this could take a while...");
+        LoggerUtil.getInstance().log(Level.INFO, "Generating " + keysize + " bit long keypair, this could take a while...");
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(keysize, SECURE_RANDOM);
-        Main.LOGGER.info("Successfully generated the keypair.");
+        LoggerUtil.getInstance().log(Level.INFO, "Successfully generated the keypair.");
         return keyGen.generateKeyPair();
+    }
+
+    /**
+     * Generates a fresh, random key
+     * @return The generated keypair
+     * @throws NoSuchAlgorithmException
+     */
+    public static SecretKey getFreshDESKey() throws NoSuchAlgorithmException {
+        LoggerUtil.getInstance().log(Level.INFO, "Generating " + 56 + " bit long key, this could take a while...");
+        KeyGenerator keyGen = KeyGenerator.getInstance("DES");
+        keyGen.init(56, SECURE_RANDOM);
+        LoggerUtil.getInstance().log(Level.INFO, "Successfully generated the keypair.");
+        return keyGen.generateKey();
     }
 
     /**
@@ -94,13 +103,13 @@ public class KryptoManager {
         for(int j = 0; j < keyPublic.length; j++) {
             keyPublicBytes[j] = Byte.valueOf(keyPublic[j]);
         }
-        Main.LOGGER.info("Found public key bytes: " + Arrays.toString(keyPublicBytes));
+        LoggerUtil.getInstance().log(Level.INFO,"Found public key bytes: " + Arrays.toString(keyPublicBytes));
 
         byte[] keyReceiverPrivateBytes = new byte[keyPrivate.length];
         for(int j = 0; j < keyPrivate.length; j++) {
             keyReceiverPrivateBytes[j] = Byte.valueOf(keyPrivate[j]);
         }
-        Main.LOGGER.info("Found private key bytes: " + Arrays.toString(keyReceiverPrivateBytes));
+        LoggerUtil.getInstance().log(Level.INFO,"Found private key bytes: " + Arrays.toString(keyReceiverPrivateBytes));
 
         // convert bytes to keys
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
