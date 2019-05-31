@@ -2,8 +2,12 @@ package de.danielprinz.hskl.nk.pgp;
 
 import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 public class Main {
 
@@ -33,12 +37,26 @@ public class Main {
     public static void authenticate(String message) {
         try {
 
-            String md5 = KryptoManager.getMD5(message);
-            System.out.println(md5);
-            System.out.println(Arrays.toString(KryptoManager.decodeHex(md5)));
-            System.out.println(KryptoManager.encodeHex(KryptoManager.decodeHex(md5)));
+            KeyPair sender = KryptoManager.getFreshKeyPair(1024);
+            KeyPair mitm = KryptoManager.getFreshKeyPair(1024);
 
-        } catch (NoSuchAlgorithmException ignored) {}
+            String md5Encrypted = KryptoManager.encrypt(sender.getPrivate(), KryptoManager.getMD5(message));
+            //String md5Encrypted = KryptoManager.encrypt(mitm.getPrivate(), KryptoManager.getMD5(message));
+
+            // send
+
+            String md5Decrypted = KryptoManager.decrypt(sender.getPublic(), md5Encrypted, 32);
+            String md5Expected = KryptoManager.getMD5(message);
+
+            if(md5Decrypted.equals(md5Expected)) {
+                System.out.println("Authenticated");
+            } else {
+                System.out.println("NOT authenticated");
+            }
+
+        } catch (NoSuchAlgorithmException ignored) {} catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e) {
+            e.printStackTrace();
+        }
     }
 
 }

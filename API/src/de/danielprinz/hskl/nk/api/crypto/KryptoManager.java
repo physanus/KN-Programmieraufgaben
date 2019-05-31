@@ -58,6 +58,23 @@ public class KryptoManager {
     }
 
     /**
+     * Decrypts a given String using the provided key, either private (for encryption) or public (for authentication). Returns the last `cutBytes` chars of the calculated String (e.g. for MD5)
+     * @param key The private or public key
+     * @param msg The String to be decrypted
+     * @param amountOfLastChars The amount of chars to be cut at the end of the decrypted string
+     * @return The decrypted String, UTF-8 encoded and cut
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
+    public static String decrypt(Key key, String msg, int amountOfLastChars) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        String decrypted = decrypt(key, msg);
+        return decrypted.substring(decrypted.length() - amountOfLastChars);
+    }
+
+    /**
      * Generates a fresh, random pair of private and public RSA keys
      * @param keysize The size of the key which should be generated, range: 512-16385
      * @return The generated keypair
