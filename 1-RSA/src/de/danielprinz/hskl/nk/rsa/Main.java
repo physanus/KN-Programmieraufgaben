@@ -21,7 +21,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
@@ -29,9 +28,8 @@ import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.*;
+import java.util.logging.Level;
 
 public class Main extends Application {
 
@@ -52,7 +50,7 @@ public class Main extends Application {
     private static Stage window;
     private static final String WINDOW_TITLE = "1-RSA";
     private static final int WINDOW_WIDTH = 870;
-    private static final int WINDOW_HEIGHT = 225;
+    private static final int WINDOW_HEIGHT = 190;
 
     private static ArrayList<Label> labels;
     private static ArrayList<TextField> textFields;
@@ -93,7 +91,7 @@ public class Main extends Application {
         buttons = new ArrayList<>();
 
         int i;
-        for(i = 0; i <= 5; i++) {
+        for(i = 0; i <= 4; i++) {
             String title = "";
             if(i == 0) {
                 title = "KeyPair Sender";
@@ -102,10 +100,8 @@ public class Main extends Application {
             } else if (i == 2) {
                 title = "Plaintext";
             } else if (i == 3) {
-                title = "Encrypted [bytes]";
+                title = "Encrypted";
             } else if (i == 4) {
-                title = "Encrypted [UTF-8]";
-            } else if (i == 5) {
                 title = "Decrypted";
             }
 
@@ -144,16 +140,14 @@ public class Main extends Application {
                         KeyPair keyPairReceiver = KryptoManager.getKeysFromString(textFields.get(1).getText());
 
                         // encrypt
-                        byte[] encryptedEncryption = KryptoManager.encrypt(keyPairReceiver.getPublic(), textFields.get(2).getText());
-                        logger.log(Level.INFO, "encryptedEncryption: " + Arrays.toString(encryptedEncryption));
-                        logger.log(Level.INFO, "encryptedEncryption: " + new String(encryptedEncryption, StandardCharsets.UTF_8));
-                        textFields.get(3).setText(Arrays.toString(encryptedEncryption));
-                        textFields.get(4).setText(new String(encryptedEncryption, StandardCharsets.UTF_8));
+                        String encryptedEncryption = KryptoManager.encrypt(keyPairReceiver.getPublic(), textFields.get(2).getText());
+                        logger.log(Level.INFO, "encryptedEncryption: " + encryptedEncryption);
+                        textFields.get(3).setText(encryptedEncryption);
 
                         // decrypt
                         String decryptedEncryption = KryptoManager.decrypt(keyPairReceiver.getPrivate(), encryptedEncryption);
                         logger.log(Level.INFO, "decryptedEncryption: " + decryptedEncryption + "\n");
-                        textFields.get(5).setText(decryptedEncryption);
+                        textFields.get(4).setText(decryptedEncryption);
 
 
                     } catch (ArrayIndexOutOfBoundsException | NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e1) {
@@ -181,15 +175,13 @@ public class Main extends Application {
                         // randomize whether the authentication should be successful or not (MITM-Attack)
                         boolean correctAuthentication = ThreadLocalRandom.current().nextBoolean();
 
-                        byte[] encryptedAuthentication = KryptoManager.encrypt(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
-                        logger.log(Level.INFO, "encryptedAuthentication: " + Arrays.toString(encryptedAuthentication));
-                        logger.log(Level.INFO, "encryptedAuthentication: " + new String(encryptedAuthentication, StandardCharsets.UTF_8));
-                        textFields.get(3).setText(Arrays.toString(encryptedAuthentication));
-                        textFields.get(4).setText(new String(encryptedAuthentication, StandardCharsets.UTF_8));
+                        String encryptedAuthentication = KryptoManager.encrypt(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
+                        logger.log(Level.INFO, "encryptedAuthentication: " + encryptedAuthentication);
+                        textFields.get(3).setText(encryptedAuthentication);
 
                         String decryptedAuthentication = KryptoManager.decrypt(keyPairSender.getPublic(), encryptedAuthentication);
                         logger.log(Level.INFO, "decryptedAuthentication: " + decryptedAuthentication + "\n");
-                        textFields.get(5).setText(decryptedAuthentication);
+                        textFields.get(4).setText(decryptedAuthentication);
 
                         AlertBox.display("Info",
                                 "If the sender was authenticated successfully,\n" +
@@ -293,10 +285,10 @@ public class Main extends Application {
         try {
             KeyPair keyPair = KryptoManager.getFreshKeyPair(keysize);
 
-            String publicKey = Arrays.toString(keyPair.getPublic().getEncoded());
-            String privateKey = Arrays.toString(keyPair.getPrivate().getEncoded());
+            String publicKey = KryptoManager.encodeHex(keyPair.getPublic().getEncoded());
+            String privateKey = KryptoManager.encodeHex(keyPair.getPrivate().getEncoded());
 
-            String keyString = publicKey + "; " + privateKey;
+            String keyString = publicKey + ", " + privateKey;
 
             logger.log(Level.INFO, "generated " + labels.get(i).getText() + ": " + keyString);
             textFields.get(i).setText(keyString);

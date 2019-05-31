@@ -33,10 +33,10 @@ public class KryptoManager {
      * @throws IllegalBlockSizeException
      * @throws InvalidKeyException
      */
-    public static byte[] encrypt(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+    public static String encrypt(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
         Cipher rsaCipher = Cipher.getInstance("RSA/ECB/NoPadding");
         rsaCipher.init(Cipher.ENCRYPT_MODE, key);
-        return rsaCipher.doFinal(msg.getBytes(StandardCharsets.UTF_8));
+        return encodeHex(rsaCipher.doFinal(msg.getBytes(StandardCharsets.UTF_8)));
     }
 
     /**
@@ -50,10 +50,10 @@ public class KryptoManager {
      * @throws BadPaddingException
      * @throws IllegalBlockSizeException
      */
-    public static String decrypt(Key key, byte[] msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    public static String decrypt(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher rsaCipher = Cipher.getInstance("RSA/ECB/NoPadding");
         rsaCipher.init(Cipher.DECRYPT_MODE , key);
-        byte[] decrypted = rsaCipher.doFinal(msg);
+        byte[] decrypted = rsaCipher.doFinal(decodeHex(msg));
         return new String(decrypted, StandardCharsets.UTF_8);
     }
 
@@ -95,31 +95,20 @@ public class KryptoManager {
      * @throws InvalidKeySpecException
      */
     public static KeyPair getKeysFromString(String keyString) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        String[] keyPublic = keyString.split("; ")[0].replaceAll("\\[", "").replaceAll("]", "").split(", ");
-        String[] keyPrivate = keyString.split("; ")[1].replaceAll("\\[", "").replaceAll("]", "").split(", ");
+        byte[] keyPublic = decodeHex(keyString.split(", ")[0]);
+        byte[] keyPrivate = decodeHex(keyString.split(", ")[1]);
 
-        // convert String to bytes
-        byte[] keyPublicBytes = new byte[keyPublic.length];
-        for(int j = 0; j < keyPublic.length; j++) {
-            keyPublicBytes[j] = Byte.valueOf(keyPublic[j]);
-        }
-        LoggerUtil.getInstance().log(Level.INFO,"Found public key bytes: " + Arrays.toString(keyPublicBytes));
-
-        byte[] keyReceiverPrivateBytes = new byte[keyPrivate.length];
-        for(int j = 0; j < keyPrivate.length; j++) {
-            keyReceiverPrivateBytes[j] = Byte.valueOf(keyPrivate[j]);
-        }
-        LoggerUtil.getInstance().log(Level.INFO,"Found private key bytes: " + Arrays.toString(keyReceiverPrivateBytes));
+        LoggerUtil.getInstance().log(Level.INFO,"Found public key bytes: " + Arrays.toString(keyPublic));
+        LoggerUtil.getInstance().log(Level.INFO,"Found private key bytes: " + Arrays.toString(keyPrivate));
 
         // convert bytes to keys
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 
-        X509EncodedKeySpec x509EncodedKeySpecPublic = new X509EncodedKeySpec(keyPublicBytes);
+        X509EncodedKeySpec x509EncodedKeySpecPublic = new X509EncodedKeySpec(keyPublic);
         PublicKey publicKey = keyFactory.generatePublic(x509EncodedKeySpecPublic);
 
-        PKCS8EncodedKeySpec pkcs8EncodedKeySpecPrivate = new PKCS8EncodedKeySpec(keyReceiverPrivateBytes);
+        PKCS8EncodedKeySpec pkcs8EncodedKeySpecPrivate = new PKCS8EncodedKeySpec(keyPrivate);
         PrivateKey privateKey = keyFactory.generatePrivate(pkcs8EncodedKeySpecPrivate);
-
 
         return new KeyPair(publicKey, privateKey);
     }
@@ -140,7 +129,7 @@ public class KryptoManager {
      * @param bytes The byte array
      * @return The String
      */
-    private static String encodeHex(byte[] bytes) {
+    public static String encodeHex(byte[] bytes) {
         return new BigInteger(1, bytes).toString(16);
     }
 
@@ -149,9 +138,11 @@ public class KryptoManager {
      * @param hex The Hex-String
      * @return the byte array
      */
-    private static byte[] decodeHex(String hex) {
+    public static byte[] decodeHex(String hex) {
         byte[] bytes = new BigInteger(hex, 16).toByteArray();
-        return Arrays.copyOfRange(bytes, 1, bytes.length);
+        if(bytes[0] == 0)
+            return Arrays.copyOfRange(bytes, 1, bytes.length);
+        return bytes;
     }
 
 
