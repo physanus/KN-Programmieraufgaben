@@ -124,6 +124,36 @@ public class KryptoManager {
         return new KeyPair(publicKey, privateKey);
     }
 
+    /**
+     * Calculates the md5 hash of a given String
+     * @param s The string to be hashed
+     * @return The hash
+     * @throws NoSuchAlgorithmException
+     */
+    public static String getMD5(String s) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+        return encodeHex(messageDigest.digest(s.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
+     * Encodes a given byte array to a String
+     * @param bytes The byte array
+     * @return The String
+     */
+    private static String encodeHex(byte[] bytes) {
+        return new BigInteger(1, bytes).toString(16);
+    }
+
+    /**
+     * Decodes a given Hex-String to a byte array
+     * @param hex The Hex-String
+     * @return the byte array
+     */
+    private static byte[] decodeHex(String hex) {
+        byte[] bytes = new BigInteger(hex, 16).toByteArray();
+        return Arrays.copyOfRange(bytes, 1, bytes.length);
+    }
+
 
     public static BigInteger getP(PrivateKey privateKey) {
         return ((RSAPrivateKey) privateKey).getModulus();
