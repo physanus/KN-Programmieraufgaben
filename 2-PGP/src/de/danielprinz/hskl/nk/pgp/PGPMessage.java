@@ -2,7 +2,7 @@ package de.danielprinz.hskl.nk.pgp;
 
 public class PGPMessage {
 
-    private static final String SPLIT_STRING = ";.,;";
+    static final String SPLIT_STRING = ";.,;";
 
     private String message;
     private String md5Encrypted;

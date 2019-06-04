@@ -27,8 +27,9 @@ public class Main {
 //            e.printStackTrace();
 //        }
 
-        authenticate("This is a secret message");
+        //authenticate("This is a secret message");
         //confidentiality("This is a secret message");
+        fullPGP("This is a secret message");
 
     }
 
@@ -39,11 +40,11 @@ public class Main {
     public static void authenticate(String message) {
         try {
 
-            KeyPair sender = KryptoManager.getFreshKeyPair(1024);
-            KeyPair mitm = KryptoManager.getFreshKeyPair(1024);
+            KeyPair keySender = KryptoManager.getFreshKeyPair(1024);
+            KeyPair keyMitm = KryptoManager.getFreshKeyPair(1024);
 
-            String md5Encrypted = KryptoManager.encryptRSA(sender.getPrivate(), KryptoManager.getMD5(message));
-            //String md5Encrypted = KryptoManager.encryptRSA(mitm.getPrivate(), KryptoManager.getMD5(message));
+            String md5Encrypted = KryptoManager.encryptRSA(keySender.getPrivate(), KryptoManager.getMD5(message));
+            //String md5Encrypted = KryptoManager.encryptRSA(keyMitm.getPrivate(), KryptoManager.getMD5(message));
 
             String pgpMessageSent = new PGPMessage(message, md5Encrypted, null).getString();
 
@@ -54,7 +55,7 @@ public class Main {
             System.out.println("isAuthentication:  " + pgpMessageReceived.isAuthentication());
             System.out.println("isConfidentiality: " + pgpMessageReceived.isConfidentiality());
 
-            String md5Decrypted = KryptoManager.decryptRSA(sender.getPublic(), pgpMessageReceived.getMd5Encrypted(), 32);
+            String md5Decrypted = KryptoManager.decryptRSA(keySender.getPublic(), pgpMessageReceived.getMd5Encrypted(), 32);
             String md5Expected = KryptoManager.getMD5(pgpMessageReceived.getMessage());
 
             if(md5Decrypted.equals(md5Expected)) {
@@ -76,12 +77,12 @@ public class Main {
             String keySymmetric = UUID.randomUUID().toString();
             KeyPair keyReceiver = KryptoManager.getFreshKeyPair(1024);
 
-            String encryptAES = KryptoManager.encryptAES(KryptoManager.getAESKey(keySymmetric), message);
+            String messageEncryptedAES = KryptoManager.encryptAES(KryptoManager.getAESKey(keySymmetric), message);
             String keySymmetricEncrypted = KryptoManager.encryptRSA(keyReceiver.getPublic(), keySymmetric);
-            System.out.println("encryptAES: " + encryptAES);
+            System.out.println("messageEncryptedAES: " + messageEncryptedAES);
             System.out.println("keySymmetricEncrypted: " + keySymmetricEncrypted);
 
-            String pgpMessageSent = new PGPMessage(encryptAES, null, keySymmetricEncrypted).getString();
+            String pgpMessageSent = new PGPMessage(messageEncryptedAES, null, keySymmetricEncrypted).getString();
 
             // send
 
@@ -90,9 +91,60 @@ public class Main {
             System.out.println("isConfidentiality: " + pgpMessageReceived.isConfidentiality());
 
             String keySymmetricDecrypted = KryptoManager.decryptRSA(keyReceiver.getPrivate(), pgpMessageReceived.getKeyEncrypted());
-            String decryptAES = KryptoManager.decryptAES(KryptoManager.getAESKey(keySymmetric), pgpMessageReceived.getMessage());
+            String messageDecryptedAES = KryptoManager.decryptAES(KryptoManager.getAESKey(keySymmetric), pgpMessageReceived.getMessage());
             System.out.println("keySymmetricDecrypted: " + keySymmetricDecrypted);
-            System.out.println("decryptAES: " + decryptAES);
+            System.out.println("messageDecryptedAES: " + messageDecryptedAES);
+
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void fullPGP(String message) {
+        try {
+
+            KeyPair keySender = KryptoManager.getFreshKeyPair(1024);
+            KeyPair keyMitm = KryptoManager.getFreshKeyPair(1024);
+
+            String md5Encrypted = KryptoManager.encryptRSA(keySender.getPrivate(), KryptoManager.getMD5(message));
+            //String md5Encrypted = KryptoManager.encryptRSA(keyMitm.getPrivate(), KryptoManager.getMD5(message));
+
+
+            String keySymmetric = UUID.randomUUID().toString();
+            KeyPair keyReceiver = KryptoManager.getFreshKeyPair(1024);
+
+            String messageEncryptedAES = KryptoManager.encryptAES(KryptoManager.getAESKey(keySymmetric), message + PGPMessage.SPLIT_STRING + md5Encrypted);
+            String keySymmetricEncrypted = KryptoManager.encryptRSA(keyReceiver.getPublic(), keySymmetric);
+
+            System.out.println("keySymmetric: " + keySymmetric);
+            System.out.println("message: " + message);
+            System.out.println("md5: " + KryptoManager.getMD5(message));
+            System.out.println("md5Encrypted: " + md5Encrypted);
+            System.out.println("MESSAGE ENCRYPTED: " + messageEncryptedAES + PGPMessage.SPLIT_STRING + keySymmetricEncrypted);
+            System.out.println("");
+
+            // send
+
+            String messageDecryptedAES = KryptoManager.decryptAES(KryptoManager.getAESKey(keySymmetric), messageEncryptedAES);
+            //System.out.println("messageDecryptedAES: " + messageDecryptedAES);
+            String keySymmetricDecrypted = KryptoManager.decryptRSA(keyReceiver.getPrivate(), keySymmetricEncrypted);
+            System.out.println("keySymmetricDecrypted: " + keySymmetricDecrypted);
+
+
+            String messageDecrypted = messageDecryptedAES.split(PGPMessage.SPLIT_STRING)[0];
+            String md5Decrypted = KryptoManager.decryptRSA(keySender.getPublic(), messageDecryptedAES.split(PGPMessage.SPLIT_STRING)[1], 32);
+
+            System.out.println("messageDecrypted: " + messageDecrypted);
+            System.out.println("md5Decrypted: " + md5Decrypted);
+
+            String md5Expected = KryptoManager.getMD5(messageDecrypted);
+
+            if(md5Decrypted.equals(md5Expected)) {
+                System.out.println("Authenticated");
+            } else {
+                System.out.println("NOT authenticated");
+            }
 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
