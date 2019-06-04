@@ -140,12 +140,12 @@ public class Main extends Application {
                         KeyPair keyPairReceiver = KryptoManager.getKeysFromString(textFields.get(1).getText());
 
                         // encrypt
-                        String encryptedEncryption = KryptoManager.encrypt(keyPairReceiver.getPublic(), textFields.get(2).getText());
+                        String encryptedEncryption = KryptoManager.encryptRSA(keyPairReceiver.getPublic(), textFields.get(2).getText());
                         logger.log(Level.INFO, "encryptedEncryption: " + encryptedEncryption);
                         textFields.get(3).setText(encryptedEncryption);
 
                         // decrypt
-                        String decryptedEncryption = KryptoManager.decrypt(keyPairReceiver.getPrivate(), encryptedEncryption);
+                        String decryptedEncryption = KryptoManager.decryptRSA(keyPairReceiver.getPrivate(), encryptedEncryption);
                         logger.log(Level.INFO, "decryptedEncryption: " + decryptedEncryption + "\n");
                         textFields.get(4).setText(decryptedEncryption);
 
@@ -175,11 +175,11 @@ public class Main extends Application {
                         // randomize whether the authentication should be successful or not (MITM-Attack)
                         boolean correctAuthentication = ThreadLocalRandom.current().nextBoolean();
 
-                        String encryptedAuthentication = KryptoManager.encrypt(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
+                        String encryptedAuthentication = KryptoManager.encryptRSA(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
                         logger.log(Level.INFO, "encryptedAuthentication: " + encryptedAuthentication);
                         textFields.get(3).setText(encryptedAuthentication);
 
-                        String decryptedAuthentication = KryptoManager.decrypt(keyPairSender.getPublic(), encryptedAuthentication);
+                        String decryptedAuthentication = KryptoManager.decryptRSA(keyPairSender.getPublic(), encryptedAuthentication);
                         logger.log(Level.INFO, "decryptedAuthentication: " + decryptedAuthentication + "\n");
                         textFields.get(4).setText(decryptedAuthentication);
 

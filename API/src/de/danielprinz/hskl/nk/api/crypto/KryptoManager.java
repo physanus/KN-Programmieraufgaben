@@ -1,6 +1,7 @@
 package de.danielprinz.hskl.nk.api.crypto;
 
 import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -33,10 +34,10 @@ public class KryptoManager {
      * @throws IllegalBlockSizeException
      * @throws InvalidKeyException
      */
-    public static String encrypt(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
-        Cipher rsaCipher = Cipher.getInstance("RSA/ECB/NoPadding");
-        rsaCipher.init(Cipher.ENCRYPT_MODE, key);
-        return encodeHex(rsaCipher.doFinal(msg.getBytes(StandardCharsets.UTF_8)));
+    public static String encryptRSA(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+        Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return encodeHex(cipher.doFinal(msg.getBytes(StandardCharsets.UTF_8)));
     }
 
     /**
@@ -50,10 +51,10 @@ public class KryptoManager {
      * @throws BadPaddingException
      * @throws IllegalBlockSizeException
      */
-    public static String decrypt(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher rsaCipher = Cipher.getInstance("RSA/ECB/NoPadding");
-        rsaCipher.init(Cipher.DECRYPT_MODE , key);
-        byte[] decrypted = rsaCipher.doFinal(decodeHex(msg));
+    public static String decryptRSA(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE , key);
+        byte[] decrypted = cipher.doFinal(decodeHex(msg));
         return new String(decrypted, StandardCharsets.UTF_8);
     }
 
@@ -69,9 +70,44 @@ public class KryptoManager {
      * @throws BadPaddingException
      * @throws IllegalBlockSizeException
      */
-    public static String decrypt(Key key, String msg, int amountOfLastChars) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        String decrypted = decrypt(key, msg);
+    public static String decryptRSA(Key key, String msg, int amountOfLastChars) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        String decrypted = decryptRSA(key, msg);
         return decrypted.substring(decrypted.length() - amountOfLastChars);
+    }
+
+    /**
+     * Encrypts a given String using the provided key
+     * @param secretKeySpec The AES key
+     * @param msg The String to be encrypted
+     * @return The encrypted byte-Array
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
+    public static String encryptAES(SecretKeySpec secretKeySpec, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+        return encodeHex(cipher.doFinal(msg.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
+     * Decrypts a given String using the provided AES key
+     * @param secretKeySpec The AES key
+     * @param msg The String to be decrypted
+     * @returnThe decrypted String, UTF-8 encoded
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
+    public static String decryptAES(SecretKeySpec secretKeySpec, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+        byte[] decrypted = cipher.doFinal(decodeHex(msg));
+        return new String(decrypted, StandardCharsets.UTF_8);
     }
 
     /**
@@ -93,7 +129,7 @@ public class KryptoManager {
 
     /**
      * Generates a fresh, random key
-     * @return The generated keypair
+     * @return The generated key
      * @throws NoSuchAlgorithmException
      */
     public static SecretKey getFreshDESKey() throws NoSuchAlgorithmException {
@@ -102,6 +138,18 @@ public class KryptoManager {
         keyGen.init(56, SECURE_RANDOM);
         LoggerUtil.getInstance().log(Level.INFO, "Successfully generated the keypair.");
         return keyGen.generateKey();
+    }
+
+    /**
+     * Generates a fresh, random AES key
+     * @param key The key to use
+     * @return The generated AES key
+     * @throws NoSuchAlgorithmException
+     */
+    public static SecretKeySpec getAESKey(String key) throws NoSuchAlgorithmException {
+        byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
+        keyBytes = Arrays.copyOf(MessageDigest.getInstance("SHA-1").digest(keyBytes), 16);
+        return new SecretKeySpec(keyBytes, "AES");
     }
 
     /**
