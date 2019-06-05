@@ -37,7 +37,7 @@ public class Main {
 
 
 
-    public static void authenticate(String message) {
+    /*public static void authenticate(String message) {
         try {
 
             KeyPair keySender = KryptoManager.getFreshKeyPair(1024);
@@ -46,7 +46,7 @@ public class Main {
             String md5Encrypted = KryptoManager.encryptRSA(keySender.getPrivate(), KryptoManager.getMD5(message));
             //String md5Encrypted = KryptoManager.encryptRSA(keyMitm.getPrivate(), KryptoManager.getMD5(message));
 
-            String pgpMessageSent = new PGPMessage(message, md5Encrypted, null).getString();
+            String pgpMessageSent = new PGPMessage(message, md5Encrypted).getString();
 
             // send
 
@@ -90,7 +90,7 @@ public class Main {
             System.out.println("isAuthentication:  " + pgpMessageReceived.isAuthentication());
             System.out.println("isConfidentiality: " + pgpMessageReceived.isConfidentiality());
 
-            String keySymmetricDecrypted = KryptoManager.decryptRSA(keyReceiver.getPrivate(), pgpMessageReceived.getKeyEncrypted());
+            String keySymmetricDecrypted = KryptoManager.decryptRSA(keyReceiver.getPrivate(), pgpMessageReceived.getKeySymmetricEncrypted());
             String messageDecryptedAES = KryptoManager.decryptAES(KryptoManager.getAESKey(keySymmetric), pgpMessageReceived.getMessage());
             System.out.println("keySymmetricDecrypted: " + keySymmetricDecrypted);
             System.out.println("messageDecryptedAES: " + messageDecryptedAES);
@@ -98,7 +98,7 @@ public class Main {
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
 
     public static void fullPGP(String message) {
@@ -106,39 +106,56 @@ public class Main {
 
             KeyPair keySender = KryptoManager.getFreshKeyPair(1024);
             KeyPair keyMitm = KryptoManager.getFreshKeyPair(1024);
-
-            String md5Encrypted = KryptoManager.encryptRSA(keySender.getPrivate(), KryptoManager.getMD5(message));
-            //String md5Encrypted = KryptoManager.encryptRSA(keyMitm.getPrivate(), KryptoManager.getMD5(message));
-
-
             String keySymmetric = UUID.randomUUID().toString();
             KeyPair keyReceiver = KryptoManager.getFreshKeyPair(1024);
 
-            String messageEncryptedAES = KryptoManager.encryptAES(KryptoManager.getAESKey(keySymmetric), message + PGPMessage.SPLIT_STRING + md5Encrypted);
-            String keySymmetricEncrypted = KryptoManager.encryptRSA(keyReceiver.getPublic(), keySymmetric);
+//            String md5Encrypted = KryptoManager.encryptRSA(keySender.getPrivate(), KryptoManager.getMD5(message));
+            //String md5Encrypted = KryptoManager.encryptRSA(keyMitm.getPrivate(), KryptoManager.getMD5(message));
 
-            System.out.println("keySymmetric: " + keySymmetric);
-            System.out.println("message: " + message);
-            System.out.println("md5: " + KryptoManager.getMD5(message));
-            System.out.println("md5Encrypted: " + md5Encrypted);
-            System.out.println("MESSAGE ENCRYPTED: " + messageEncryptedAES + PGPMessage.SPLIT_STRING + keySymmetricEncrypted);
+            PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keySender.getPrivate());
+            //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
+            PGPMessage pgpMessage = new PGPMessage(pgpMessageHash, keySymmetric, keyReceiver.getPublic());
+
+            System.out.println("pgpMessage.getString(): " + pgpMessage.getString());
+
+//            System.out.println("");
+
+
+//            String messageEncryptedAES = KryptoManager.encryptAES(KryptoManager.getAESKey(keySymmetric), message + PGPMessage.SPLIT_STRING + md5Encrypted);
+//            String keySymmetricEncrypted = KryptoManager.encryptRSA(keyReceiver.getPublic(), keySymmetric);
+
+
+
+//            System.out.println("message: " + message);
+//            System.out.println("md5: " + KryptoManager.getMD5(message));
+//            System.out.println("md5Encrypted: " + md5Encrypted);
+//            System.out.println("keySymmetric: " + keySymmetric);
+//            System.out.println("keySymmetric: " + keySymmetric.length());
+
+//            System.out.println("MESSAGE ENCRYPTED: " + messageEncryptedAES + PGPMessage.SPLIT_STRING + keySymmetricEncrypted);
+            System.out.println("");
+            System.out.println("===== SEND =====");
             System.out.println("");
 
-            // send
+            // send pgpMessage.getString()
 
-            String messageDecryptedAES = KryptoManager.decryptAES(KryptoManager.getAESKey(keySymmetric), messageEncryptedAES);
-            //System.out.println("messageDecryptedAES: " + messageDecryptedAES);
-            String keySymmetricDecrypted = KryptoManager.decryptRSA(keyReceiver.getPrivate(), keySymmetricEncrypted);
-            System.out.println("keySymmetricDecrypted: " + keySymmetricDecrypted);
+            PGPMessageHash pgpMessageHashDecrypted = PGPMessage.getPGPMessage(pgpMessage.getString(), keyReceiver.getPrivate());
+
+//            String keySymmetricDecrypted = KryptoManager.decryptRSA(keyReceiver.getPrivate(), keySymmetricEncrypted, 36);
+//            System.out.println("keySymmetricDecrypted: " + keySymmetricDecrypted);
+//            String messageDecryptedAES = KryptoManager.decryptAES(KryptoManager.getAESKey(keySymmetricDecrypted), messageEncryptedAES);
+//            System.out.println("messageDecryptedAES: " + messageDecryptedAES);
 
 
-            String messageDecrypted = messageDecryptedAES.split(PGPMessage.SPLIT_STRING)[0];
-            String md5Decrypted = KryptoManager.decryptRSA(keySender.getPublic(), messageDecryptedAES.split(PGPMessage.SPLIT_STRING)[1], 32);
 
-            System.out.println("messageDecrypted: " + messageDecrypted);
+//            String messageDecrypted = messageDecryptedAES.split(PGPMessage.SPLIT_STRING)[0];
+//            String md5Decrypted = KryptoManager.decryptRSA(keySender.getPublic(), messageDecryptedAES.split(PGPMessage.SPLIT_STRING)[1], 32);
+            String md5Decrypted = pgpMessageHashDecrypted.getMd5Decrypted(keySender.getPublic());
+
+//            System.out.println("messageDecrypted: " + messageDecrypted);
             System.out.println("md5Decrypted: " + md5Decrypted);
 
-            String md5Expected = KryptoManager.getMD5(messageDecrypted);
+            String md5Expected = KryptoManager.getMD5(pgpMessageHashDecrypted.getMessage());
 
             if(md5Decrypted.equals(md5Expected)) {
                 System.out.println("Authenticated");
