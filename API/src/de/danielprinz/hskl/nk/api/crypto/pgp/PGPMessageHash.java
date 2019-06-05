@@ -41,6 +41,10 @@ public class PGPMessageHash {
         return md5Encrypted;
     }
 
+    public boolean isAuthentication() {
+        return md5Encrypted != null && !md5Encrypted.isEmpty();
+    }
+
 
     public String getString() {
         return this.md5Encrypted == null ? this.message : this.message + PGPMessage.SPLIT_STRING + this.md5Encrypted;

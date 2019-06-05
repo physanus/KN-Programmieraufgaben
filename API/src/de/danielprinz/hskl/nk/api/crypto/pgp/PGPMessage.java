@@ -16,27 +16,14 @@ public class PGPMessage {
 
     private String pgpMessageHashString;
     private String keySymmetricEncrypted;
-
-    /*public PGPMessage(String message, String md5Encrypted, String keySymmetricEncrypted) {
-        if(message != null && message.equals("null")) message = null;
-        if(md5Encrypted != null && md5Encrypted.equals("null")) md5Encrypted = null;
-        if(keySymmetricEncrypted != null && keySymmetricEncrypted.equals("null")) keySymmetricEncrypted = null;
-
-        this.pgpMessageHash = new PGPMessageHash(message, md5Encrypted);
-        this.keySymmetricEncrypted = keySymmetricEncrypted;
-    }
-
-    public PGPMessage(String message, String md5Encrypted) {
-        if(message != null && message.equals("null")) message = null;
-        if(md5Encrypted != null && md5Encrypted.equals("null")) md5Encrypted = null;
-
-        this.pgpMessageHash = new PGPMessageHash(message, md5Encrypted);
-    }*/
+    private boolean isAuthentication;
 
     public PGPMessage(PGPMessageHash pgpMessageHash, String keySymmetric, PublicKey publicKey) throws NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchPaddingException {
         this.pgpMessageHashString = KryptoManager.encryptAES(KryptoManager.getAESKey(keySymmetric), pgpMessageHash.getString());
         this.keySymmetricEncrypted = KryptoManager.encryptRSA(publicKey, keySymmetric);
+        this.isAuthentication = pgpMessageHash.isAuthentication();
     }
+
 
     public static PGPMessageHash getPGPMessage(String pgpMessage, PrivateKey privateKey) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
         String[] pgpMessageSplit = pgpMessage.split(SPLIT_STRING);
@@ -56,19 +43,13 @@ public class PGPMessage {
         return pgpMessageHashString + SPLIT_STRING + keySymmetricEncrypted;
     }
 
-    /*public boolean isAuthentication() {
-        //return md5Encrypted != null && !md5Encrypted.isEmpty();
-        return false;
+    public boolean isAuthentication() {
+        return isAuthentication;
     }
 
     public boolean isConfidentiality() {
         return keySymmetricEncrypted != null && !keySymmetricEncrypted.isEmpty();
-    }*/
-
-    /*public static PGPMessage getPGPMessage(String pgpMessage) {
-        String[] pgpMessageSplit = pgpMessage.split(SPLIT_STRING);
-        return new PGPMessage(pgpMessageSplit[0], pgpMessageSplit[1], pgpMessageSplit[2]);
-    }*/
+    }
 
 
     @Override
