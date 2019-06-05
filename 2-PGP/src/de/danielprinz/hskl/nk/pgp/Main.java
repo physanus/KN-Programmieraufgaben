@@ -2,6 +2,8 @@ package de.danielprinz.hskl.nk.pgp;
 
 import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
 import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
+import de.danielprinz.hskl.nk.api.crypto.pgp.PGPMessage;
+import de.danielprinz.hskl.nk.api.crypto.pgp.PGPMessageHash;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;

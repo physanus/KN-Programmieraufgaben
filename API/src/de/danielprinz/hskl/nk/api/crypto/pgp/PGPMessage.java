@@ -1,4 +1,4 @@
-package de.danielprinz.hskl.nk.pgp;
+package de.danielprinz.hskl.nk.api.crypto.pgp;
 
 import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
 
