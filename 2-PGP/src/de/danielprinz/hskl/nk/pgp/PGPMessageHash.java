@@ -25,6 +25,10 @@ public class PGPMessageHash {
         this.md5Encrypted = KryptoManager.encryptRSA(privateKey, KryptoManager.getMD5(message));
     }
 
+    public PGPMessageHash(String message) {
+        this.message = message;
+    }
+
     public String getMd5Decrypted(PublicKey publicKey) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
         return KryptoManager.decryptRSA(publicKey, md5Encrypted, 32);
     }
@@ -39,7 +43,7 @@ public class PGPMessageHash {
 
 
     public String getString() {
-        return this.message + PGPMessage.SPLIT_STRING + this.md5Encrypted;
+        return this.md5Encrypted == null ? this.message : this.message + PGPMessage.SPLIT_STRING + this.md5Encrypted;
     }
 
 

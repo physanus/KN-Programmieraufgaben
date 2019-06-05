@@ -44,7 +44,11 @@ public class PGPMessage {
         String pgpMessageHashString = KryptoManager.decryptAES(KryptoManager.getAESKey(keySymmetricDecrypted), pgpMessageSplit[0]);
 
         String[] pgpMessageHashStringSplit = pgpMessageHashString.split(SPLIT_STRING);
-        return new PGPMessageHash(pgpMessageHashStringSplit[0], pgpMessageHashStringSplit[1]);
+        if(pgpMessageHashStringSplit.length == 1) {
+            return new PGPMessageHash(pgpMessageHashStringSplit[0]);
+        } else {
+            return new PGPMessageHash(pgpMessageHashStringSplit[0], pgpMessageHashStringSplit[1]);
+        }
     }
 
 
