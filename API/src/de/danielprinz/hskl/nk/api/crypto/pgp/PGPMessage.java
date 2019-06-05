@@ -10,6 +10,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+/**
+ * Stores the whole PGP message and its hash and AES key
+ */
 public class PGPMessage {
 
     static final String SPLIT_STRING = ";.,;";

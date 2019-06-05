@@ -5,8 +5,6 @@ import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
@@ -149,6 +147,7 @@ public class KryptoManager {
     public static SecretKeySpec getAESKey(String key) throws NoSuchAlgorithmException {
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         keyBytes = Arrays.copyOf(MessageDigest.getInstance("SHA-1").digest(keyBytes), 16);
+        LoggerUtil.getInstance().log(Level.INFO, "Calculated AES key from String [" + key + "]: " + Arrays.toString(keyBytes));
         return new SecretKeySpec(keyBytes, "AES");
     }
 
@@ -186,7 +185,9 @@ public class KryptoManager {
      */
     public static String getMD5(String s) throws NoSuchAlgorithmException {
         MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-        return encodeHex(messageDigest.digest(s.getBytes(StandardCharsets.UTF_8)));
+        String md5 = encodeHex(messageDigest.digest(s.getBytes(StandardCharsets.UTF_8)));
+        LoggerUtil.getInstance().log(Level.INFO, "Calculated MD5 from String [" + s + "]: " + md5);
+        return md5;
     }
 
     /**
@@ -210,21 +211,6 @@ public class KryptoManager {
         return bytes;
     }
 
-
-    public static BigInteger getP(PrivateKey privateKey) {
-        return ((RSAPrivateKey) privateKey).getModulus();
-    }
-    public static BigInteger getP(PublicKey publicKey) {
-        return ((RSAPublicKey) publicKey).getModulus();
-    }
-
-    public static BigInteger getQ(PrivateKey privateKey) {
-        return ((RSAPrivateKey) privateKey).getPrivateExponent();
-    }
-
-    public static BigInteger getE(PublicKey publicKey) {
-        return ((RSAPublicKey) publicKey).getPublicExponent();
-    }
 
 
 }

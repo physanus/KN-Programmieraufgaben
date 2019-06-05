@@ -10,6 +10,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+/**
+ * Stores the PGP message and its hash
+ */
 public class PGPMessageHash {
 
     private String message;

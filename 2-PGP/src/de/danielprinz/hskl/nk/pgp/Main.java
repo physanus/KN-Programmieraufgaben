@@ -18,9 +18,12 @@ public class Main {
 
     public static void main(String[] args) {
 
-        //authenticate("This is a secret message");
+        LoggerUtil.getInstance().log(Level.FINE, "Authentication");
+        authenticate("This is a secret message");
+        LoggerUtil.getInstance().log(Level.FINE, "Confidentiality");
         confidentiality("This is a secret message");
-        //fullPGP("This is a secret message");
+        LoggerUtil.getInstance().log(Level.FINE, "Full PGP");
+        fullPGP("This is a secret message");
 
     }
 
@@ -37,7 +40,7 @@ public class Main {
             PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keySender.getPrivate());
             //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
 
-            LoggerUtil.getInstance().log(Level.INFO, "Encrypted PGP message: " + pgpMessageHash.getString());
+            LoggerUtil.getInstance().log(Level.FINE, "Encrypted PGP message: " + pgpMessageHash.getString());
 
             // send pgpMessageHash.getString()
 
@@ -45,9 +48,9 @@ public class Main {
             String md5Expected = KryptoManager.getMD5(pgpMessageHash.getMessage());
 
             if(md5Decrypted.equals(md5Expected)) {
-                LoggerUtil.getInstance().log(Level.INFO, "PGP message was authenticated");
+                LoggerUtil.getInstance().log(Level.FINE, "PGP message was authenticated");
             } else {
-                LoggerUtil.getInstance().log(Level.INFO, "PGP message was NOT authenticated");
+                LoggerUtil.getInstance().log(Level.FINE, "PGP message was NOT authenticated");
             }
 
         } catch (NoSuchAlgorithmException ignored) {} catch (BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e) {
@@ -69,13 +72,12 @@ public class Main {
             //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
             PGPMessage pgpMessage = new PGPMessage(pgpMessageHash, keySymmetric, keyReceiver.getPublic());
 
-            LoggerUtil.getInstance().log(Level.INFO, "Encrypted PGP message: " + pgpMessage.getString());
+            LoggerUtil.getInstance().log(Level.FINE, "Encrypted PGP message: " + pgpMessage.getString());
 
             // send pgpMessage.getString()
 
             PGPMessageHash pgpMessageHashDecrypted = PGPMessage.getPGPMessage(pgpMessage.getString(), keyReceiver.getPrivate());
-            System.out.println(pgpMessageHashDecrypted.getMessage());
-            LoggerUtil.getInstance().log(Level.INFO, "Decrypted PGP message: " + pgpMessage.getString());
+            LoggerUtil.getInstance().log(Level.FINE, "Decrypted PGP message: " + pgpMessageHashDecrypted.getString());
 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
@@ -95,18 +97,19 @@ public class Main {
             //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
             PGPMessage pgpMessage = new PGPMessage(pgpMessageHash, keySymmetric, keyReceiver.getPublic());
 
-            LoggerUtil.getInstance().log(Level.INFO, "Encrypted PGP message: " + pgpMessage.getString());
+            LoggerUtil.getInstance().log(Level.FINE, "Encrypted PGP message: " + pgpMessage.getString());
 
             // send pgpMessage.getString()
 
             PGPMessageHash pgpMessageHashDecrypted = PGPMessage.getPGPMessage(pgpMessage.getString(), keyReceiver.getPrivate());
+            LoggerUtil.getInstance().log(Level.FINE, "Decrypted PGP message: " + pgpMessageHashDecrypted.getMessage());
             String md5Decrypted = pgpMessageHashDecrypted.getMd5Decrypted(keySender.getPublic());
             String md5Expected = KryptoManager.getMD5(pgpMessageHashDecrypted.getMessage());
 
             if(md5Decrypted.equals(md5Expected)) {
-                LoggerUtil.getInstance().log(Level.INFO, "PGP message was authenticated");
+                LoggerUtil.getInstance().log(Level.FINE, "PGP message was authenticated");
             } else {
-                LoggerUtil.getInstance().log(Level.INFO, "PGP message was NOT authenticated");
+                LoggerUtil.getInstance().log(Level.FINE, "PGP message was NOT authenticated");
             }
 
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
