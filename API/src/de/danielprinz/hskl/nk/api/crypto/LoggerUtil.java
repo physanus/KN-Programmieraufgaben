@@ -59,11 +59,11 @@ public class LoggerUtil {
         this.logger.setLevel(logLevel);
     }
 
-    public void log(Level level, String msg) {
-        this.logger.log(level, msg);
+    public static void log(Level level, String msg) {
+        getInstance().logger.log(level, msg);
     }
 
-    public static LoggerUtil getInstance() {
+    private static LoggerUtil getInstance() {
         return instance;
     }
 

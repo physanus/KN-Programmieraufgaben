@@ -118,10 +118,10 @@ public class KryptoManager {
         if(keysize < 512) throw new IllegalArgumentException("Keysize must be greater than 512");
         if(keysize > 16384) throw new IllegalArgumentException("Keysize must be less than 16385");
 
-        LoggerUtil.getInstance().log(Level.INFO, "Generating " + keysize + " bit long keypair, this could take a while...");
+        LoggerUtil.log(Level.INFO, "Generating " + keysize + " bit long keypair, this could take a while...");
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
         keyGen.initialize(keysize, SECURE_RANDOM);
-        LoggerUtil.getInstance().log(Level.INFO, "Successfully generated the keypair.");
+        LoggerUtil.log(Level.INFO, "Successfully generated the keypair.");
         return keyGen.generateKeyPair();
     }
 
@@ -131,10 +131,10 @@ public class KryptoManager {
      * @throws NoSuchAlgorithmException
      */
     public static SecretKey getFreshDESKey() throws NoSuchAlgorithmException {
-        LoggerUtil.getInstance().log(Level.INFO, "Generating " + 56 + " bit long key, this could take a while...");
+        LoggerUtil.log(Level.INFO, "Generating " + 56 + " bit long key, this could take a while...");
         KeyGenerator keyGen = KeyGenerator.getInstance("DES");
         keyGen.init(56, SECURE_RANDOM);
-        LoggerUtil.getInstance().log(Level.INFO, "Successfully generated the keypair.");
+        LoggerUtil.log(Level.INFO, "Successfully generated the keypair.");
         return keyGen.generateKey();
     }
 
@@ -147,7 +147,7 @@ public class KryptoManager {
     public static SecretKeySpec getAESKey(String key) throws NoSuchAlgorithmException {
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         keyBytes = Arrays.copyOf(MessageDigest.getInstance("SHA-1").digest(keyBytes), 16);
-        LoggerUtil.getInstance().log(Level.INFO, "Calculated AES key from String [" + key + "]: " + Arrays.toString(keyBytes));
+        LoggerUtil.log(Level.INFO, "Calculated AES key from String [" + key + "]: " + Arrays.toString(keyBytes));
         return new SecretKeySpec(keyBytes, "AES");
     }
 
@@ -162,8 +162,8 @@ public class KryptoManager {
         byte[] keyPublic = decodeHex(keyString.split(", ")[0]);
         byte[] keyPrivate = decodeHex(keyString.split(", ")[1]);
 
-        LoggerUtil.getInstance().log(Level.INFO,"Found public key bytes: " + Arrays.toString(keyPublic));
-        LoggerUtil.getInstance().log(Level.INFO,"Found private key bytes: " + Arrays.toString(keyPrivate));
+        LoggerUtil.log(Level.INFO,"Found public key bytes: " + Arrays.toString(keyPublic));
+        LoggerUtil.log(Level.INFO,"Found private key bytes: " + Arrays.toString(keyPrivate));
 
         // convert bytes to keys
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -186,8 +186,31 @@ public class KryptoManager {
     public static String getMD5(String s) throws NoSuchAlgorithmException {
         MessageDigest messageDigest = MessageDigest.getInstance("MD5");
         String md5 = encodeHex(messageDigest.digest(s.getBytes(StandardCharsets.UTF_8)));
-        LoggerUtil.getInstance().log(Level.INFO, "Calculated MD5 from String [" + s + "]: " + md5);
+        LoggerUtil.log(Level.INFO, "Calculated MD5 from String [" + s + "]: " + md5);
         return md5;
+    }
+
+    /**
+     * Calculates the MD5/RSA signature of a given string for the provided privateKey
+     * @param privateKey The private key
+     * @param s The string
+     * @return The signature
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws SignatureException
+     */
+    public static String getSignature(PrivateKey privateKey, String s) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance("MD5withRSA");
+        signature.initSign(privateKey);
+        signature.update(s.getBytes(StandardCharsets.UTF_8));
+        return encodeHex(signature.sign());
+    }
+
+    public static boolean verifySignature(PublicKey publicKey, String s, String sign) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance("MD5withRSA");
+        signature.initVerify(publicKey);
+        signature.update(s.getBytes(StandardCharsets.UTF_8));
+        return signature.verify(decodeHex(sign));
     }
 
     /**
@@ -210,7 +233,6 @@ public class KryptoManager {
             return Arrays.copyOfRange(bytes, 1, bytes.length);
         return bytes;
     }
-
 
 
 }
