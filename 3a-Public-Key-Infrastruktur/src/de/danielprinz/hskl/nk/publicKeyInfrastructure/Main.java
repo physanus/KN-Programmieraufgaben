@@ -1,6 +1,8 @@
 package de.danielprinz.hskl.nk.publicKeyInfrastructure;
 
 import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
+import de.danielprinz.hskl.nk.api.crypto.ca.CA;
+import de.danielprinz.hskl.nk.api.crypto.ca.Cert;
 
 import java.lang.reflect.Field;
 import java.security.InvalidKeyException;

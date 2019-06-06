@@ -1,4 +1,4 @@
-package de.danielprinz.hskl.nk.publicKeyInfrastructure;
+package de.danielprinz.hskl.nk.api.crypto.ca;
 
 import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
 import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
