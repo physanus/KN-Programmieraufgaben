@@ -20,17 +20,17 @@ public class Main {
 
             // layer 1
             CA ca1  = new CA("ca1");
-            ca1.generateCertificate(root);
+            root.generateCertificate(ca1);
 
             CA ca2  = new CA("ca2");
-            ca2.generateCertificate(root);
+            root.generateCertificate(ca2);
 
             // layer 2
             CA member1 = new CA("member1");
-            member1.generateCertificate(ca1);
+            ca1.generateCertificate(member1);
 
             CA member2 = new CA("member2");
-            member2.generateCertificate(ca1);
+            ca1.generateCertificate(member2);
             // manipulate cert
             try {
                 Field f = Cert.class.getDeclaredField("issuer");
@@ -42,7 +42,7 @@ public class Main {
             }
 
             CA member3 = new CA("member3");
-            member3.generateCertificate(ca2);
+            ca2.generateCertificate(member3);
 
 
 

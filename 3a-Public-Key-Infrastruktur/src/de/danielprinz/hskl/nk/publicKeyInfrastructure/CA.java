@@ -23,15 +23,15 @@ public class CA {
 
 
     /**
-     * Generates the CA for the provided issuer
-     * @param issuer
+     * Generates the Cert for the provided CA
+     * @param ca The CA
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
      * @throws SignatureException
      */
-    public void generateCertificate(CA issuer) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        this.rootCA = issuer;
-        this.cert = new Cert(name, "RSA/ECB/NoPadding", keyPair, issuer.getName(), "MD5withRSA");
+    public void generateCertificate(CA ca) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        ca.rootCA = this;
+        ca.cert = new Cert(name, "RSA/ECB/NoPadding", keyPair, ca.getName(), "MD5withRSA");
         LoggerUtil.log(Level.INFO, "Generated certificate: " + cert);
     }
 
