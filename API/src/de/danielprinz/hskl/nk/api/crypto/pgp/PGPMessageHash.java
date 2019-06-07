@@ -32,7 +32,7 @@ public class PGPMessageHash {
         this.message = message;
     }
 
-    public String getMd5Decrypted(PublicKey publicKey) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
+    public String getMD5Decrypted(PublicKey publicKey) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
         return KryptoManager.decryptRSA(publicKey, md5Encrypted, 32);
     }
 

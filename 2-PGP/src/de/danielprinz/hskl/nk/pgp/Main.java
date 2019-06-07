@@ -44,7 +44,7 @@ public class Main {
 
             // send pgpMessageHash.getString()
 
-            String md5Decrypted = pgpMessageHash.getMd5Decrypted(keySender.getPublic());
+            String md5Decrypted = pgpMessageHash.getMD5Decrypted(keySender.getPublic());
             String md5Expected = KryptoManager.getMD5(pgpMessageHash.getMessage());
 
             if(md5Decrypted.equals(md5Expected)) {
@@ -103,7 +103,7 @@ public class Main {
 
             PGPMessageHash pgpMessageHashDecrypted = PGPMessage.getPGPMessage(pgpMessage.getString(), keyReceiver.getPrivate());
             LoggerUtil.log(Level.FINE, "Decrypted PGP message: " + pgpMessageHashDecrypted.getMessage());
-            String md5Decrypted = pgpMessageHashDecrypted.getMd5Decrypted(keySender.getPublic());
+            String md5Decrypted = pgpMessageHashDecrypted.getMD5Decrypted(keySender.getPublic());
             String md5Expected = KryptoManager.getMD5(pgpMessageHashDecrypted.getMessage());
 
             if(md5Decrypted.equals(md5Expected)) {

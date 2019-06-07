@@ -1,5 +1,7 @@
 package de.danielprinz.hskl.nk.api.crypto;
 
+import de.danielprinz.hskl.nk.api.crypto.pgp.PGPMessageHash;
+
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
@@ -56,6 +58,13 @@ public class KryptoManager {
         return new String(decrypted, StandardCharsets.UTF_8);
     }
 
+    public static byte[] decryptRSAToBytes(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE , key);
+        byte[] decrypted = cipher.doFinal(decodeHex(msg));
+        return decrypted;
+    }
+
     /**
      * Decrypts a given String using the provided key, either private (for encryption) or public (for authentication). Returns the last `cutBytes` chars of the calculated String (e.g. for MD5)
      * @param key The private or public key
@@ -70,7 +79,11 @@ public class KryptoManager {
      */
     public static String decryptRSA(Key key, String msg, int amountOfLastChars) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         String decrypted = decryptRSA(key, msg);
-        return decrypted.substring(decrypted.length() - amountOfLastChars);
+        if(decrypted.length() - amountOfLastChars > 0) {
+            return decrypted.substring(decrypted.length() - amountOfLastChars);
+        } else {
+            return decrypted;
+        }
     }
 
     /**
@@ -199,18 +212,36 @@ public class KryptoManager {
      * @throws InvalidKeyException
      * @throws SignatureException
      */
-    public static String getSignature(PrivateKey privateKey, String s) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature signature = Signature.getInstance("MD5withRSA");
-        signature.initSign(privateKey);
-        signature.update(s.getBytes(StandardCharsets.UTF_8));
-        return encodeHex(signature.sign());
+    public static String getSignature(PrivateKey privateKey, String s) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
+        // Signature signature = Signature.getInstance("MD5withRSA");
+        // signature.initSign(privateKey);
+        // signature.update(s.getBytes(StandardCharsets.UTF_8));
+        // return encodeHex(signature.sign());
+
+        return new PGPMessageHash(s, privateKey).getMd5Encrypted();
     }
 
-    public static boolean verifySignature(PublicKey publicKey, String s, String sign) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature signature = Signature.getInstance("MD5withRSA");
-        signature.initVerify(publicKey);
-        signature.update(s.getBytes(StandardCharsets.UTF_8));
-        return signature.verify(decodeHex(sign));
+    public static boolean verifySignature(PublicKey publicKey, String s, String sign) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
+        // Signature signature = Signature.getInstance("MD5withRSA");
+        // signature.initVerify(publicKey);
+        // signature.update(s.getBytes(StandardCharsets.UTF_8));
+        // return signature.verify(decodeHex(sign));
+
+        String md5Expected = KryptoManager.getMD5(s);
+        String md5Decrypted = KryptoManager.decryptRSA(publicKey, sign, md5Expected.length());
+
+        // System.out.println("md5Expected: " + md5Expected);
+        // System.out.println("md5Expected.length(): " + md5Expected.length());
+        // System.out.println("md5Decrypted: " + md5Decrypted);
+        // System.out.println("md5Decrypted.length(): " + md5Decrypted.length());
+
+        if(md5Decrypted.equals(md5Expected)) {
+            LoggerUtil.log(Level.FINE, "Signature was verified");
+            return true;
+        } else {
+            LoggerUtil.log(Level.FINE, "Signature was not verified");
+            return false;
+        }
     }
 
     /**

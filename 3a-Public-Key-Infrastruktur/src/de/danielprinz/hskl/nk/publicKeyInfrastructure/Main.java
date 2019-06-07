@@ -4,6 +4,9 @@ import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
 import de.danielprinz.hskl.nk.api.crypto.ca.CA;
 import de.danielprinz.hskl.nk.api.crypto.ca.Cert;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -69,7 +72,7 @@ public class Main {
             }
 
 
-        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
 

@@ -2,7 +2,11 @@ package de.danielprinz.hskl.nk.api.crypto.ca;
 
 import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.security.*;
+import java.util.ArrayList;
 
 public class Cert {
 
@@ -13,7 +17,7 @@ public class Cert {
     private String signatureAlgorithm;
     private String signature;
 
-    public Cert(String subject, String publicKeyAlgorithm, KeyPair keyPair, String issuer, String signatureAlgorithm) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public Cert(String subject, String publicKeyAlgorithm, KeyPair keyPair, String issuer, String signatureAlgorithm) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         this.subject = subject;
         this.publicKeyAlgorithm = publicKeyAlgorithm;
         this.publicKey = keyPair.getPublic();
@@ -45,6 +49,26 @@ public class Cert {
 
     public String getSignature() {
         return signature;
+    }
+
+
+    /**
+     * Verifies the cert
+     * @param cas A list of available CAs
+     * @return A boolean. True: verified. False: not verified.
+     * @throws IllegalBlockSizeException
+     * @throws NoSuchPaddingException
+     * @throws BadPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     */
+    public boolean verifyCert(ArrayList<CA> cas) throws IllegalBlockSizeException, NoSuchPaddingException, BadPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        for(CA ca : cas) {
+            if(ca.getCert() == this) {
+                return ca.verifyCert();
+            }
+        }
+        return false;
     }
 
 
