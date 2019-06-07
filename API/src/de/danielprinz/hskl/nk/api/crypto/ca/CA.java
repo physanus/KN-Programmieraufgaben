@@ -31,8 +31,8 @@ public class CA {
      */
     public void generateCertificate(CA ca) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         ca.rootCA = this;
-        ca.cert = new Cert(name, "RSA/ECB/NoPadding", keyPair, ca.getName(), "MD5withRSA");
-        LoggerUtil.log(Level.INFO, "Generated certificate: " + cert);
+        ca.cert = new Cert(ca.name, "RSA/ECB/NoPadding", ca.keyPair, name, "MD5withRSA");
+        LoggerUtil.log(Level.INFO, "Generated certificate: " + ca.cert);
     }
 
 
