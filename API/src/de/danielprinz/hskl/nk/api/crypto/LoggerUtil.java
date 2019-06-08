@@ -51,8 +51,8 @@ public class LoggerUtil {
     }
 
 
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
+    public static void setPrefix(String prefix) {
+        getInstance().prefix = prefix;
     }
 
     public void setLogLevel(Level logLevel) {

@@ -10,7 +10,6 @@ import javax.crypto.NoSuchPaddingException;
 import java.lang.reflect.Field;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.util.logging.Level;
 
 public class Main {
@@ -72,7 +71,7 @@ public class Main {
             }
 
 
-        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeyException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
 

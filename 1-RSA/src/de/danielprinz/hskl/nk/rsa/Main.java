@@ -41,8 +41,7 @@ public class Main extends Application {
 
     public static void main(String[] args) {
 
-        logger = LoggerUtil.getInstance();
-        logger.setPrefix("1-RSA");
+        LoggerUtil.setPrefix("1-RSA");
 
         launch(args);
     }
