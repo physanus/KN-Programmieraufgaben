@@ -1,6 +1,6 @@
 package de.danielprinz.hskl.nk.api.crypto.pgp;
 
-import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
+import de.danielprinz.hskl.nk.api.crypto.CryptoManager;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -22,16 +22,16 @@ public class PGPMessage {
     private boolean isAuthentication;
 
     public PGPMessage(PGPMessageHash pgpMessageHash, String keySymmetric, PublicKey publicKey) throws NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchPaddingException {
-        this.pgpMessageHashString = KryptoManager.encryptAES(KryptoManager.getAESKey(keySymmetric), pgpMessageHash.getString());
-        this.keySymmetricEncrypted = KryptoManager.encryptRSA(publicKey, keySymmetric);
+        this.pgpMessageHashString = CryptoManager.encryptAES(CryptoManager.getAESKey(keySymmetric), pgpMessageHash.getString());
+        this.keySymmetricEncrypted = CryptoManager.encryptRSA(publicKey, keySymmetric);
         this.isAuthentication = pgpMessageHash.isAuthentication();
     }
 
 
     public static PGPMessageHash getPGPMessage(String pgpMessage, PrivateKey privateKey) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
         String[] pgpMessageSplit = pgpMessage.split(SPLIT_STRING);
-        String keySymmetricDecrypted = KryptoManager.decryptRSA(privateKey, pgpMessageSplit[1], 36);
-        String pgpMessageHashString = KryptoManager.decryptAES(KryptoManager.getAESKey(keySymmetricDecrypted), pgpMessageSplit[0]);
+        String keySymmetricDecrypted = CryptoManager.decryptRSA(privateKey, pgpMessageSplit[1], 36);
+        String pgpMessageHashString = CryptoManager.decryptAES(CryptoManager.getAESKey(keySymmetricDecrypted), pgpMessageSplit[0]);
 
         String[] pgpMessageHashStringSplit = pgpMessageHashString.split(SPLIT_STRING);
         if(pgpMessageHashStringSplit.length == 1) {

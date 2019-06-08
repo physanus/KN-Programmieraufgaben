@@ -1,6 +1,6 @@
 package de.danielprinz.hskl.nk.api.crypto.ca;
 
-import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
+import de.danielprinz.hskl.nk.api.crypto.CryptoManager;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -23,7 +23,7 @@ public class Cert {
         this.publicKey = keyPair.getPublic();
         this.issuer = issuer;
         this.signatureAlgorithm = signatureAlgorithm;
-        this.signature = KryptoManager.getSignature(keyPair.getPrivate(), this.getString());
+        this.signature = CryptoManager.getSignature(keyPair.getPrivate(), this.getString());
     }
 
 
@@ -77,7 +77,7 @@ public class Cert {
         return "Cert{" +
                 "subject='" + subject + '\'' +
                 ", publicKeyAlgorithm='" + publicKeyAlgorithm + '\'' +
-                ", publicKey=" + KryptoManager.encodeHex(publicKey.getEncoded()) +
+                ", publicKey=" + CryptoManager.encodeHex(publicKey.getEncoded()) +
                 ", issuer='" + issuer + '\'' +
                 ", signatureAlgorithm='" + signatureAlgorithm + '\'' +
                 '}';
@@ -88,7 +88,7 @@ public class Cert {
         return "Cert{" +
                 "subject='" + subject + '\'' +
                 ", publicKeyAlgorithm='" + publicKeyAlgorithm + '\'' +
-                ", publicKey=" + KryptoManager.encodeHex(publicKey.getEncoded()) +
+                ", publicKey=" + CryptoManager.encodeHex(publicKey.getEncoded()) +
                 ", issuer='" + issuer + '\'' +
                 ", signatureAlgorithm='" + signatureAlgorithm + '\'' +
                 ", signature=" + signature +

@@ -13,7 +13,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.logging.Level;
 
-public class KryptoManager {
+public class CryptoManager {
 
     // Define a secure random for better randomized keys
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
@@ -58,13 +58,6 @@ public class KryptoManager {
         return new String(decrypted, StandardCharsets.UTF_8);
     }
 
-    public static byte[] decryptRSAToBytes(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
-        Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
-        cipher.init(Cipher.DECRYPT_MODE , key);
-        byte[] decrypted = cipher.doFinal(decodeHex(msg));
-        return decrypted;
-    }
-
     /**
      * Decrypts a given String using the provided key, either private (for encryption) or public (for authentication). Returns the last `cutBytes` chars of the calculated String (e.g. for MD5)
      * @param key The private or public key
@@ -107,7 +100,7 @@ public class KryptoManager {
      * Decrypts a given String using the provided AES key
      * @param secretKeySpec The AES key
      * @param msg The String to be decrypted
-     * @returnThe decrypted String, UTF-8 encoded
+     * @return The decrypted String, UTF-8 encoded
      * @throws NoSuchPaddingException
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
@@ -123,17 +116,17 @@ public class KryptoManager {
 
     /**
      * Generates a fresh, random pair of private and public RSA keys
-     * @param keysize The size of the key which should be generated, range: 512-16385
+     * @param keySize The size of the key which should be generated, range: 512-16385
      * @return The generated keypair
      * @throws NoSuchAlgorithmException
      */
-    public static KeyPair getFreshKeyPair(int keysize) throws NoSuchAlgorithmException {
-        if(keysize < 512) throw new IllegalArgumentException("Keysize must be greater than 512");
-        if(keysize > 16384) throw new IllegalArgumentException("Keysize must be less than 16385");
+    public static KeyPair getFreshKeyPair(int keySize) throws NoSuchAlgorithmException {
+        if(keySize < 512) throw new IllegalArgumentException("The key size must be greater than 512");
+        if(keySize > 16384) throw new IllegalArgumentException("The key size must be less than 16385");
 
-        LoggerUtil.log(Level.INFO, "Generating " + keysize + " bit long keypair, this could take a while...");
+        LoggerUtil.log(Level.INFO, "Generating " + keySize + " bit long keypair, this could take a while...");
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-        keyGen.initialize(keysize, SECURE_RANDOM);
+        keyGen.initialize(keySize, SECURE_RANDOM);
         LoggerUtil.log(Level.INFO, "Successfully generated the keypair.");
         return keyGen.generateKeyPair();
     }
@@ -165,7 +158,7 @@ public class KryptoManager {
     }
 
     /**
-     * Retrieves the keys from the resective String-representation
+     * Retrieves the keys from the respective String-representation
      * @param keyString The String to be retrieved
      * @return The KeyPair [private & public key included]
      * @throws NoSuchAlgorithmException
@@ -210,7 +203,9 @@ public class KryptoManager {
      * @return The signature
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
-     * @throws SignatureException
+     * @throws NoSuchPaddingException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
      */
     public static String getSignature(PrivateKey privateKey, String s) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         // Signature signature = Signature.getInstance("MD5withRSA");
@@ -227,8 +222,8 @@ public class KryptoManager {
         // signature.update(s.getBytes(StandardCharsets.UTF_8));
         // return signature.verify(decodeHex(sign));
 
-        String md5Expected = KryptoManager.getMD5(s);
-        String md5Decrypted = KryptoManager.decryptRSA(publicKey, sign, md5Expected.length());
+        String md5Expected = CryptoManager.getMD5(s);
+        String md5Decrypted = CryptoManager.decryptRSA(publicKey, sign, md5Expected.length());
 
         // System.out.println("md5Expected: " + md5Expected);
         // System.out.println("md5Expected.length(): " + md5Expected.length());

@@ -40,7 +40,7 @@ public class Main {
                 Field f = Cert.class.getDeclaredField("issuer");
                 f.setAccessible(true);
                 f.set(member2.getCert(), "Fake Issuer");
-                LoggerUtil.log(Level.INFO, "Manupulated certificate: " + member2.getCert().toString());
+                LoggerUtil.log(Level.INFO, "Manipulated certificate: " + member2.getCert().toString());
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 e.printStackTrace();
             }

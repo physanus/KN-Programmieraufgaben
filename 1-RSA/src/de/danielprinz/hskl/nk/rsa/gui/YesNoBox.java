@@ -25,7 +25,7 @@ public class YesNoBox {
         Stage window = new Stage();
         try {
             window.getIcons().add(new Image(Main.class.getResourceAsStream("/unlocked.png")));
-        } catch (NullPointerException ignores) {}
+        } catch (NullPointerException ignored) {}
 
         // Block events to other windows
         window.initModality(Modality.APPLICATION_MODAL);
@@ -62,20 +62,20 @@ public class YesNoBox {
         });
         GridPane.setConstraints(yesButton, 0, 0);
 
-        Button nobutton = new Button("No");
-        GridPane.setHalignment(nobutton, HPos.CENTER);
-        nobutton.setOnAction(e -> {
+        Button noButton = new Button("No");
+        GridPane.setHalignment(noButton, HPos.CENTER);
+        noButton.setOnAction(e -> {
             window.close();
             no.run();
         });
-        nobutton.setOnKeyTyped(event -> {
+        noButton.setOnKeyTyped(event -> {
             window.close();
             no.run();
         });
-        GridPane.setConstraints(nobutton, 1, 0);
+        GridPane.setConstraints(noButton, 1, 0);
 
 
-        optionsPane.getChildren().addAll(yesButton, nobutton);
+        optionsPane.getChildren().addAll(yesButton, noButton);
 
         grid.getChildren().addAll(label, optionsPane);
         grid.setAlignment(Pos.CENTER);

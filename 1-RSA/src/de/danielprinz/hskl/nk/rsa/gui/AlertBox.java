@@ -23,7 +23,7 @@ public class AlertBox {
         Stage window = new Stage();
         try {
             window.getIcons().add(new Image(Main.class.getResourceAsStream("/unlocked.png")));
-        } catch (NullPointerException ignores) {}
+        } catch (NullPointerException ignored) {}
 
         // Block events to other windows
         window.initModality(Modality.APPLICATION_MODAL);

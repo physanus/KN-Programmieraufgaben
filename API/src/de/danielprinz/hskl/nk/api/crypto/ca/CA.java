@@ -1,6 +1,6 @@
 package de.danielprinz.hskl.nk.api.crypto.ca;
 
-import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
+import de.danielprinz.hskl.nk.api.crypto.CryptoManager;
 import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
 
 import javax.crypto.BadPaddingException;
@@ -18,7 +18,7 @@ public class CA {
 
     public CA(String name) throws NoSuchAlgorithmException {
         this.name = name;
-        this.keyPair = KryptoManager.getFreshKeyPair(1024);
+        this.keyPair = CryptoManager.getFreshKeyPair(1024);
     }
 
 
@@ -27,7 +27,9 @@ public class CA {
      * @param ca The CA
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
-     * @throws SignatureException
+     * @throws NoSuchPaddingException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
      */
     public void generateCertificate(CA ca) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         ca.rootCA = this;
@@ -48,18 +50,13 @@ public class CA {
         return keyPair.getPublic();
     }
 
-    @Deprecated
-    public PrivateKey getPrivateKey() {
-        return keyPair.getPrivate();
-    }
-
     public boolean verifyCert() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         if(this == rootCA) return true;
-        return KryptoManager.verifySignature(rootCA.getPublicKey(), cert.getString(), cert.getSignature()) && rootCA.verifyCert();
+        return CryptoManager.verifySignature(rootCA.getPublicKey(), cert.getString(), cert.getSignature()) && rootCA.verifyCert();
     }
 
     public String getSignature(String s) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
-        return KryptoManager.getSignature(keyPair.getPrivate(), s);
+        return CryptoManager.getSignature(keyPair.getPrivate(), s);
     }
 
 

@@ -21,13 +21,13 @@ public class KeySizeGUI {
     private static Button generate;
 
     /**
-     * Displays a GUI for selection of the keysize and a file to save the generated keys to
+     * Displays a GUI for selection of the keySize and a file to save the generated keys to
      * @param i The no of the textfield being triggered on
      */
     public static void display(int i) {
 
         Stage window = new Stage();
-        window.setTitle("Select Keysize");
+        window.setTitle("Select key size");
         try {
             window.getIcons().add(new Image(Main.class.getResourceAsStream("/unlocked.png")));
         } catch (NullPointerException ignored) {}
@@ -41,27 +41,25 @@ public class KeySizeGUI {
         grid.setVgap(8);
         grid.setHgap(10);
 
-        Label keysizeLabel = new Label("Keysize");
-        keysizeLabel.setMinWidth(fontLoader.computeStringWidth(keysizeLabel.getText(), keysizeLabel.getFont()));
-        GridPane.setConstraints(keysizeLabel, 0, 0);
+        Label keySizeLabel = new Label("Key size");
+        keySizeLabel.setMinWidth(fontLoader.computeStringWidth(keySizeLabel.getText(), keySizeLabel.getFont()));
+        GridPane.setConstraints(keySizeLabel, 0, 0);
 
-        TextField keysizeTextField = new TextField();
-        keysizeTextField.setPrefColumnCount(13);
-        keysizeTextField.setText("2048");
+        TextField keySizeTextField = new TextField();
+        keySizeTextField.setPrefColumnCount(13);
+        keySizeTextField.setText("2048");
         // force the field to be numeric only
-        keysizeTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+        keySizeTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue.equals("")) return;
             try {
                 Integer.parseInt(newValue);
             } catch (NumberFormatException e) {
-                keysizeTextField.setText(oldValue);
+                keySizeTextField.setText(oldValue);
             }
         });
 
-        keysizeTextField.setOnAction(event -> {
-            generate.fire();
-        });
-        GridPane.setConstraints(keysizeTextField, 1, 0);
+        keySizeTextField.setOnAction(event -> generate.fire());
+        GridPane.setConstraints(keySizeTextField, 1, 0);
 
 
         generate = new Button("Generate");
@@ -69,18 +67,18 @@ public class KeySizeGUI {
         GridPane.setConstraints(generate, 1, 1);
         generate.setOnAction(event -> {
 
-            int keysize = Integer.parseInt(keysizeTextField.getText());
+            int keySize = Integer.parseInt(keySizeTextField.getText());
 
-            if(keysize < 512) {
-                AlertBox.display("Fehler", "The keysize must be greater than or equal 512 Bit");
+            if(keySize < 512) {
+                AlertBox.display("Error", "The key size must be greater than or equal 512 Bit");
                 return;
-            } else if(keysize > 16384) {
-                AlertBox.display("Fehler", "The keysize must be less than or equal 16384 Bit");
+            } else if(keySize > 16384) {
+                AlertBox.display("Error", "The key size must be less than or equal 16384 Bit");
                 return;
             }
 
             window.close();
-            Main.generateKeyPairGUI(keysize, i, null);
+            Main.generateKeyPairGUI(keySize, i, null);
         });
 
 
@@ -89,13 +87,13 @@ public class KeySizeGUI {
         GridPane.setConstraints(generateAndSave, 1, 2);
         generateAndSave.setOnAction(event -> {
 
-            int keysize = Integer.parseInt(keysizeTextField.getText());
+            int keySize = Integer.parseInt(keySizeTextField.getText());
 
-            if(keysize < 512) {
-                AlertBox.display("Fehler", "The keysize must be greater than or equal 512 Bit");
+            if(keySize < 512) {
+                AlertBox.display("Error", "The key size must be greater than or equal 512 Bit");
                 return;
-            } else if(keysize > 16384) {
-                AlertBox.display("Fehler", "The keysize must be less than or equal 16384 Bit");
+            } else if(keySize > 16384) {
+                AlertBox.display("Error", "The key size must be less than or equal 16384 Bit");
                 return;
             }
 
@@ -110,7 +108,7 @@ public class KeySizeGUI {
 
             if(selectedFile != null) {
                 window.close();
-                Main.generateKeyPairGUI(keysize, i, selectedFile);
+                Main.generateKeyPairGUI(keySize, i, selectedFile);
             }
 
 
@@ -118,7 +116,7 @@ public class KeySizeGUI {
 
 
         // Add everything to grid
-        grid.getChildren().addAll(keysizeLabel, keysizeTextField, generate, generateAndSave);
+        grid.getChildren().addAll(keySizeLabel, keySizeTextField, generate, generateAndSave);
 
         Scene scene = new Scene(grid, 240, 110);
         window.setScene(scene);

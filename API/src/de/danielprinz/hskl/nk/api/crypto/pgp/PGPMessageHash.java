@@ -1,6 +1,6 @@
 package de.danielprinz.hskl.nk.api.crypto.pgp;
 
-import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
+import de.danielprinz.hskl.nk.api.crypto.CryptoManager;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -25,7 +25,7 @@ public class PGPMessageHash {
 
     public PGPMessageHash(String message, PrivateKey privateKey) throws NoSuchAlgorithmException, IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchPaddingException {
         this.message = message;
-        this.md5Encrypted = KryptoManager.encryptRSA(privateKey, KryptoManager.getMD5(message));
+        this.md5Encrypted = CryptoManager.encryptRSA(privateKey, CryptoManager.getMD5(message));
     }
 
     public PGPMessageHash(String message) {
@@ -33,7 +33,7 @@ public class PGPMessageHash {
     }
 
     public String getMD5Decrypted(PublicKey publicKey) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
-        return KryptoManager.decryptRSA(publicKey, md5Encrypted, 32);
+        return CryptoManager.decryptRSA(publicKey, md5Encrypted, 32);
     }
 
     public String getMessage() {

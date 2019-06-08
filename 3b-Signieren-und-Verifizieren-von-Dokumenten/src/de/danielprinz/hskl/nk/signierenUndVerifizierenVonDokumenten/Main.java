@@ -1,6 +1,6 @@
 package de.danielprinz.hskl.nk.signierenUndVerifizierenVonDokumenten;
 
-import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
+import de.danielprinz.hskl.nk.api.crypto.CryptoManager;
 import de.danielprinz.hskl.nk.api.crypto.ca.CA;
 import de.danielprinz.hskl.nk.api.crypto.ca.Cert;
 
@@ -33,10 +33,10 @@ public class Main {
             System.out.println("signature: " + signature);
 
 
-            // Überprüfen des Dokuments (Authentizität & Integrität)
-            System.out.println(KryptoManager.verifySignature(aliceCert.getPublicKey(), document, signature));
+            // Validation of the document (authenticity & integrity)
+            System.out.println(CryptoManager.verifySignature(aliceCert.getPublicKey(), document, signature));
 
-            // Überprüfen des öffentlichen Schlüssels
+            // Validation of the public key
             System.out.println(aliceCert.verifyCert(cas));
 
 

@@ -2,7 +2,7 @@ package de.danielprinz.hskl.nk.rsa;
 
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
-import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
+import de.danielprinz.hskl.nk.api.crypto.CryptoManager;
 import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
 import de.danielprinz.hskl.nk.rsa.gui.AlertBox;
 import de.danielprinz.hskl.nk.rsa.gui.KeySizeGUI;
@@ -36,8 +36,6 @@ public class Main extends Application {
     // ICON src
     // https://www.flaticon.com/free-icon/unlocked_149463
 
-    private static Main instance;
-    private static LoggerUtil logger;
 
     public static void main(String[] args) {
 
@@ -57,7 +55,7 @@ public class Main extends Application {
 
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
 
         instance = this;
 
@@ -136,22 +134,22 @@ public class Main extends Application {
 
                     try {
 
-                        KeyPair keyPairReceiver = KryptoManager.getKeysFromString(textFields.get(1).getText());
+                        KeyPair keyPairReceiver = CryptoManager.getKeysFromString(textFields.get(1).getText());
 
                         // encrypt
-                        String encryptedEncryption = KryptoManager.encryptRSA(keyPairReceiver.getPublic(), textFields.get(2).getText());
-                        logger.log(Level.INFO, "encryptedEncryption: " + encryptedEncryption);
+                        String encryptedEncryption = CryptoManager.encryptRSA(keyPairReceiver.getPublic(), textFields.get(2).getText());
+                        LoggerUtil.log(Level.INFO, "encryptedEncryption: " + encryptedEncryption);
                         textFields.get(3).setText(encryptedEncryption);
 
                         // decrypt
-                        String decryptedEncryption = KryptoManager.decryptRSA(keyPairReceiver.getPrivate(), encryptedEncryption);
-                        logger.log(Level.INFO, "decryptedEncryption: " + decryptedEncryption + "\n");
+                        String decryptedEncryption = CryptoManager.decryptRSA(keyPairReceiver.getPrivate(), encryptedEncryption);
+                        LoggerUtil.log(Level.INFO, "decryptedEncryption: " + decryptedEncryption + "\n");
                         textFields.get(4).setText(decryptedEncryption);
 
 
                     } catch (ArrayIndexOutOfBoundsException | NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e1) {
                         e1.printStackTrace();
-                        AlertBox.display("Fehler", "One of the keys seems to be broken.\nPlease, check their correctness!");
+                        AlertBox.display("Error", "One of the keys seems to be broken.\nPlease, check their correctness!");
                     }
 
 
@@ -168,18 +166,18 @@ public class Main extends Application {
 
                     try {
 
-                        KeyPair keyPairSender = KryptoManager.getKeysFromString(textFields.get(0).getText());
-                        KeyPair keyPairReceiver = KryptoManager.getKeysFromString(textFields.get(1).getText());
+                        KeyPair keyPairSender = CryptoManager.getKeysFromString(textFields.get(0).getText());
+                        KeyPair keyPairReceiver = CryptoManager.getKeysFromString(textFields.get(1).getText());
 
                         // randomize whether the authentication should be successful or not (MITM-Attack)
                         boolean correctAuthentication = ThreadLocalRandom.current().nextBoolean();
 
-                        String encryptedAuthentication = KryptoManager.encryptRSA(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
-                        logger.log(Level.INFO, "encryptedAuthentication: " + encryptedAuthentication);
+                        String encryptedAuthentication = CryptoManager.encryptRSA(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
+                        LoggerUtil.log(Level.INFO, "encryptedAuthentication: " + encryptedAuthentication);
                         textFields.get(3).setText(encryptedAuthentication);
 
-                        String decryptedAuthentication = KryptoManager.decryptRSA(keyPairSender.getPublic(), encryptedAuthentication);
-                        logger.log(Level.INFO, "decryptedAuthentication: " + decryptedAuthentication + "\n");
+                        String decryptedAuthentication = CryptoManager.decryptRSA(keyPairSender.getPublic(), encryptedAuthentication);
+                        LoggerUtil.log(Level.INFO, "decryptedAuthentication: " + decryptedAuthentication + "\n");
                         textFields.get(4).setText(decryptedAuthentication);
 
                         AlertBox.display("Info",
@@ -191,7 +189,7 @@ public class Main extends Application {
 
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e1) {
                         e1.printStackTrace();
-                        AlertBox.display("Fehler", "One of the keys seems to be broken.\nPlease, check their correctness!");
+                        AlertBox.display("Error", "One of the keys seems to be broken.\nPlease, check their correctness!");
                     }
 
                 });
@@ -230,7 +228,7 @@ public class Main extends Application {
                 try {
                     String keyString = new String(Files.readAllBytes(Paths.get(selectedFile.getAbsolutePath())));
                     try {
-                        KryptoManager.getKeysFromString(keyString);
+                        CryptoManager.getKeysFromString(keyString);
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException e1) {
                         AlertBox.display("Error", "The key is invalid");
                         return;
@@ -276,20 +274,20 @@ public class Main extends Application {
 
     /**
      * Fetches a new KeySet, inputs it into the GUI and saves it to the file if specified
-     * @param keysize The size of the key which should be generated, range: 512-16385
+     * @param keySize The size of the key which should be generated, range: 512-16385
      * @param i The no of the textfield being triggered on
      * @param file The file where the keys should be saved to OR null if the keys should not be saved
      */
-    public static void generateKeyPairGUI(int keysize, int i, File file) {
+    public static void generateKeyPairGUI(int keySize, int i, File file) {
         try {
-            KeyPair keyPair = KryptoManager.getFreshKeyPair(keysize);
+            KeyPair keyPair = CryptoManager.getFreshKeyPair(keySize);
 
-            String publicKey = KryptoManager.encodeHex(keyPair.getPublic().getEncoded());
-            String privateKey = KryptoManager.encodeHex(keyPair.getPrivate().getEncoded());
+            String publicKey = CryptoManager.encodeHex(keyPair.getPublic().getEncoded());
+            String privateKey = CryptoManager.encodeHex(keyPair.getPrivate().getEncoded());
 
             String keyString = publicKey + ", " + privateKey;
 
-            logger.log(Level.INFO, "generated " + labels.get(i).getText() + ": " + keyString);
+            LoggerUtil.log(Level.INFO, "generated " + labels.get(i).getText() + ": " + keyString);
             textFields.get(i).setText(keyString);
 
             if(file != null) {

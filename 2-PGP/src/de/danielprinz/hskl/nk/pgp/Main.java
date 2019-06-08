@@ -1,6 +1,6 @@
 package de.danielprinz.hskl.nk.pgp;
 
-import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
+import de.danielprinz.hskl.nk.api.crypto.CryptoManager;
 import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
 import de.danielprinz.hskl.nk.api.crypto.pgp.PGPMessage;
 import de.danielprinz.hskl.nk.api.crypto.pgp.PGPMessageHash;
@@ -34,8 +34,8 @@ public class Main {
     public static void authenticate(String message) {
         try {
 
-            KeyPair keySender = KryptoManager.getFreshKeyPair(1024);
-            KeyPair keyMitm = KryptoManager.getFreshKeyPair(1024);
+            KeyPair keySender = CryptoManager.getFreshKeyPair(1024);
+            KeyPair keyMitm = CryptoManager.getFreshKeyPair(1024);
 
             PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keySender.getPrivate());
             //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
@@ -45,7 +45,7 @@ public class Main {
             // send pgpMessageHash.getString()
 
             String md5Decrypted = pgpMessageHash.getMD5Decrypted(keySender.getPublic());
-            String md5Expected = KryptoManager.getMD5(pgpMessageHash.getMessage());
+            String md5Expected = CryptoManager.getMD5(pgpMessageHash.getMessage());
 
             if(md5Decrypted.equals(md5Expected)) {
                 LoggerUtil.log(Level.FINE, "PGP message was authenticated");
@@ -63,10 +63,10 @@ public class Main {
     public static void confidentiality(String message) {
         try {
 
-            KeyPair keySender = KryptoManager.getFreshKeyPair(1024);
-            KeyPair keyMitm = KryptoManager.getFreshKeyPair(1024);
+            KeyPair keySender = CryptoManager.getFreshKeyPair(1024);
+            KeyPair keyMitm = CryptoManager.getFreshKeyPair(1024);
             String keySymmetric = UUID.randomUUID().toString();
-            KeyPair keyReceiver = KryptoManager.getFreshKeyPair(1024);
+            KeyPair keyReceiver = CryptoManager.getFreshKeyPair(1024);
 
             PGPMessageHash pgpMessageHash = new PGPMessageHash(message);
             //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
@@ -88,10 +88,10 @@ public class Main {
     public static void fullPGP(String message) {
         try {
 
-            KeyPair keySender = KryptoManager.getFreshKeyPair(1024);
-            KeyPair keyMitm = KryptoManager.getFreshKeyPair(1024);
+            KeyPair keySender = CryptoManager.getFreshKeyPair(1024);
+            KeyPair keyMitm = CryptoManager.getFreshKeyPair(1024);
             String keySymmetric = UUID.randomUUID().toString();
-            KeyPair keyReceiver = KryptoManager.getFreshKeyPair(1024);
+            KeyPair keyReceiver = CryptoManager.getFreshKeyPair(1024);
 
             PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keySender.getPrivate());
             //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
@@ -104,7 +104,7 @@ public class Main {
             PGPMessageHash pgpMessageHashDecrypted = PGPMessage.getPGPMessage(pgpMessage.getString(), keyReceiver.getPrivate());
             LoggerUtil.log(Level.FINE, "Decrypted PGP message: " + pgpMessageHashDecrypted.getMessage());
             String md5Decrypted = pgpMessageHashDecrypted.getMD5Decrypted(keySender.getPublic());
-            String md5Expected = KryptoManager.getMD5(pgpMessageHashDecrypted.getMessage());
+            String md5Expected = CryptoManager.getMD5(pgpMessageHashDecrypted.getMessage());
 
             if(md5Decrypted.equals(md5Expected)) {
                 LoggerUtil.log(Level.FINE, "PGP message was authenticated");
