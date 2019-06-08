@@ -11,14 +11,15 @@ import java.util.logging.Level;
 
 public class CA {
 
-    private String name;
-    private KeyPair keyPair;
+    private final String name;
+    private final KeyPair keyPair;
     private Cert cert;
     private CA rootCA;
 
-    public CA(String name) throws NoSuchAlgorithmException {
+    public CA(String name, CA rootCA) throws NoSuchAlgorithmException {
         this.name = name;
         this.keyPair = KryptoManager.getFreshKeyPair(1024);
+        this.rootCA = rootCA;
     }
 
 
@@ -27,7 +28,9 @@ public class CA {
      * @param ca The CA
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
-     * @throws SignatureException
+     * @throws NoSuchPaddingException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
      */
     public void generateCertificate(CA ca) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         ca.rootCA = this;
@@ -55,7 +58,7 @@ public class CA {
 
     public boolean verifyCert() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         if(this == rootCA) return true;
-        return KryptoManager.verifySignature(rootCA.getPublicKey(), cert.getString(), cert.getSignature()) && rootCA.verifyCert();
+        return KryptoManager.verifySignature(rootCA.keyPair.getPublic(), cert.getString(), cert.getSignature()) && rootCA.verifyCert();
     }
 
     public String getSignature(String s) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {

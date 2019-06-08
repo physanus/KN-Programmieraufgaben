@@ -1,6 +1,5 @@
-package de.danielprinz.hskl.nk.rsa.gui;
+package de.danielprinz.hskl.nk.api.gui;
 
-import de.danielprinz.hskl.nk.rsa.Main;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,7 +21,7 @@ public class AlertBox {
     public static void display(String title, String message) {
         Stage window = new Stage();
         try {
-            window.getIcons().add(new Image(Main.class.getResourceAsStream("/unlocked.png")));
+            window.getIcons().add(new Image(AlertBox.class.getResourceAsStream("/unlocked.png")));
         } catch (NullPointerException ignores) {}
 
         // Block events to other windows

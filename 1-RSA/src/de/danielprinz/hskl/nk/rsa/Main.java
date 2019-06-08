@@ -4,8 +4,8 @@ import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
 import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
-import de.danielprinz.hskl.nk.rsa.gui.AlertBox;
-import de.danielprinz.hskl.nk.rsa.gui.KeySizeGUI;
+import de.danielprinz.hskl.nk.api.gui.AlertBox;
+import de.danielprinz.hskl.nk.api.gui.KeySizeGUI;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -37,14 +37,6 @@ public class Main extends Application {
     // https://www.flaticon.com/free-icon/unlocked_149463
 
     private static Main instance;
-    private static LoggerUtil logger;
-
-    public static void main(String[] args) {
-
-        LoggerUtil.setPrefix("1-RSA");
-
-        launch(args);
-    }
 
     private static Stage window;
     private static final String WINDOW_TITLE = "1-RSA";
@@ -54,6 +46,12 @@ public class Main extends Application {
     private static ArrayList<Label> labels;
     private static ArrayList<TextField> textFields;
     private static ArrayList<Button> buttons;
+
+
+    public static void main(String[] args) {
+        LoggerUtil.setPrefix(WINDOW_TITLE);
+        launch(args);
+    }
 
 
     @Override
@@ -140,12 +138,12 @@ public class Main extends Application {
 
                         // encrypt
                         String encryptedEncryption = KryptoManager.encryptRSA(keyPairReceiver.getPublic(), textFields.get(2).getText());
-                        logger.log(Level.INFO, "encryptedEncryption: " + encryptedEncryption);
+                        LoggerUtil.log(Level.INFO, "encryptedEncryption: " + encryptedEncryption);
                         textFields.get(3).setText(encryptedEncryption);
 
                         // decrypt
                         String decryptedEncryption = KryptoManager.decryptRSA(keyPairReceiver.getPrivate(), encryptedEncryption);
-                        logger.log(Level.INFO, "decryptedEncryption: " + decryptedEncryption + "\n");
+                        LoggerUtil.log(Level.INFO, "decryptedEncryption: " + decryptedEncryption + "\n");
                         textFields.get(4).setText(decryptedEncryption);
 
 
@@ -175,11 +173,11 @@ public class Main extends Application {
                         boolean correctAuthentication = ThreadLocalRandom.current().nextBoolean();
 
                         String encryptedAuthentication = KryptoManager.encryptRSA(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
-                        logger.log(Level.INFO, "encryptedAuthentication: " + encryptedAuthentication);
+                        LoggerUtil.log(Level.INFO, "encryptedAuthentication: " + encryptedAuthentication);
                         textFields.get(3).setText(encryptedAuthentication);
 
                         String decryptedAuthentication = KryptoManager.decryptRSA(keyPairSender.getPublic(), encryptedAuthentication);
-                        logger.log(Level.INFO, "decryptedAuthentication: " + decryptedAuthentication + "\n");
+                        LoggerUtil.log(Level.INFO, "decryptedAuthentication: " + decryptedAuthentication + "\n");
                         textFields.get(4).setText(decryptedAuthentication);
 
                         AlertBox.display("Info",
@@ -256,7 +254,7 @@ public class Main extends Application {
             GridPane.setConstraints(generateButton, 3, i);
 
             int finalI = i;
-            generateButton.setOnAction(e -> KeySizeGUI.display(finalI));
+            generateButton.setOnAction(e -> KeySizeGUI.display(finalI, labels, textFields));
             buttons.add(generateButton);
 
         }
@@ -274,36 +272,7 @@ public class Main extends Application {
     }
 
 
-    /**
-     * Fetches a new KeySet, inputs it into the GUI and saves it to the file if specified
-     * @param keysize The size of the key which should be generated, range: 512-16385
-     * @param i The no of the textfield being triggered on
-     * @param file The file where the keys should be saved to OR null if the keys should not be saved
-     */
-    public static void generateKeyPairGUI(int keysize, int i, File file) {
-        try {
-            KeyPair keyPair = KryptoManager.getFreshKeyPair(keysize);
 
-            String publicKey = KryptoManager.encodeHex(keyPair.getPublic().getEncoded());
-            String privateKey = KryptoManager.encodeHex(keyPair.getPrivate().getEncoded());
-
-            String keyString = publicKey + ", " + privateKey;
-
-            logger.log(Level.INFO, "generated " + labels.get(i).getText() + ": " + keyString);
-            textFields.get(i).setText(keyString);
-
-            if(file != null) {
-                try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
-                    out.print(keyString);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-    }
 
 
 

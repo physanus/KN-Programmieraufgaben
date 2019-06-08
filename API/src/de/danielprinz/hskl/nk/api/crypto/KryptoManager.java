@@ -61,8 +61,7 @@ public class KryptoManager {
     public static byte[] decryptRSAToBytes(Key key, String msg) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
         Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
         cipher.init(Cipher.DECRYPT_MODE , key);
-        byte[] decrypted = cipher.doFinal(decodeHex(msg));
-        return decrypted;
+        return cipher.doFinal(decodeHex(msg));
     }
 
     /**
@@ -210,7 +209,9 @@ public class KryptoManager {
      * @return The signature
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeyException
-     * @throws SignatureException
+     * @throws NoSuchPaddingException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
      */
     public static String getSignature(PrivateKey privateKey, String s) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         // Signature signature = Signature.getInstance("MD5withRSA");
