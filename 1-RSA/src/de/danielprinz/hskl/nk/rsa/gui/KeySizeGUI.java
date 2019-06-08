@@ -1,9 +1,8 @@
-package de.danielprinz.hskl.nk.api.gui;
+package de.danielprinz.hskl.nk.rsa.gui;
 
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
-import de.danielprinz.hskl.nk.api.crypto.KryptoManager;
-import de.danielprinz.hskl.nk.api.crypto.LoggerUtil;
+import de.danielprinz.hskl.nk.rsa.Main;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -16,13 +15,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.logging.Level;
 
 public class KeySizeGUI {
 
@@ -32,12 +24,12 @@ public class KeySizeGUI {
      * Displays a GUI for selection of the keysize and a file to save the generated keys to
      * @param i The no of the textfield being triggered on
      */
-    public static void display(int i, ArrayList<Label> labels, ArrayList<TextField> textFields) {
+    public static void display(int i) {
 
         Stage window = new Stage();
         window.setTitle("Select Keysize");
         try {
-            window.getIcons().add(new Image(KeySizeGUI.class.getResourceAsStream("/unlocked.png")));
+            window.getIcons().add(new Image(Main.class.getResourceAsStream("/unlocked.png")));
         } catch (NullPointerException ignored) {}
         window.initModality(Modality.APPLICATION_MODAL);
 
@@ -88,7 +80,7 @@ public class KeySizeGUI {
             }
 
             window.close();
-            generateKeyPairGUI(keysize, i, null, labels, textFields);
+            Main.generateKeyPairGUI(keysize, i, null);
         });
 
 
@@ -118,7 +110,7 @@ public class KeySizeGUI {
 
             if(selectedFile != null) {
                 window.close();
-                generateKeyPairGUI(keysize, i, selectedFile, labels, textFields);
+                Main.generateKeyPairGUI(keysize, i, selectedFile);
             }
 
 
@@ -133,40 +125,5 @@ public class KeySizeGUI {
         window.showAndWait();
 
     }
-
-
-
-    /**
-     * Fetches a new KeySet, inputs it into the GUI and saves it to the file if specified
-     * @param keysize The size of the key which should be generated, range: 512-16385
-     * @param i The no of the textfield being triggered on
-     * @param file The file where the keys should be saved to OR null if the keys should not be saved
-     */
-    private static void generateKeyPairGUI(int keysize, int i, File file, ArrayList<Label> labels, ArrayList<TextField> textFields) {
-        try {
-            KeyPair keyPair = KryptoManager.getFreshKeyPair(keysize);
-
-            String publicKey = KryptoManager.encodeHex(keyPair.getPublic().getEncoded());
-            String privateKey = KryptoManager.encodeHex(keyPair.getPrivate().getEncoded());
-
-            String keyString = publicKey + ", " + privateKey;
-
-            LoggerUtil.log(Level.INFO, "generated " + labels.get(i).getText() + ": " + keyString);
-            textFields.get(i).setText(keyString);
-
-            if(file != null) {
-                try (PrintStream out = new PrintStream(new FileOutputStream(file))) {
-                    out.print(keyString);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-    }
-
-
 
 }
