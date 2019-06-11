@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/1-RSA/1-RSA.iml" filepath="$PROJECT_DIR$/1-RSA/1-RSA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/2-PGP/2-PGP.iml" filepath="$PROJECT_DIR$/2-PGP/2-PGP.iml" />
+      <module fileurl="file://$PROJECT_DIR$/3a-Public-Key-Infrastruktur/3a-Public-Key-Infrastruktur.iml" filepath="$PROJECT_DIR$/3a-Public-Key-Infrastruktur/3a-Public-Key-Infrastruktur.iml" />
+      <module fileurl="file://$PROJECT_DIR$/3b-Signieren-und-Verifizieren-von-Dokumenten/3b-Signieren-und-Verifizieren-von-Dokumenten.iml" filepath="$PROJECT_DIR$/3b-Signieren-und-Verifizieren-von-Dokumenten/3b-Signieren-und-Verifizieren-von-Dokumenten.iml" />
+      <module fileurl="file://$PROJECT_DIR$/API/API.iml" filepath="$PROJECT_DIR$/API/API.iml" />
+    </modules>
+  </component>
+</project>

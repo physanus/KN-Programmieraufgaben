@@ -1,8 +1,6 @@
 *.class
 *.war
 *.ear
-*.iml
-.idea
 out
 .DS_Store
 bin
