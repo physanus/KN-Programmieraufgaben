@@ -37,8 +37,12 @@ public class Main {
             KeyPair keySender = CryptoManager.getFreshKeyPair(1024);
             KeyPair keyMitm = CryptoManager.getFreshKeyPair(1024);
 
-            PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keySender.getPrivate());
-            //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
+            boolean manInTheMiddleAttack = false;
+            PGPMessageHash pgpMessageHash;
+            if(!manInTheMiddleAttack)
+                pgpMessageHash = new PGPMessageHash(message, keySender.getPrivate());
+            else
+                pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
 
             LoggerUtil.log(Level.FINE, "Encrypted PGP message: " + pgpMessageHash.getString());
 
@@ -90,8 +94,12 @@ public class Main {
             String keySymmetric = UUID.randomUUID().toString();
             KeyPair keyReceiver = CryptoManager.getFreshKeyPair(1024);
 
-            PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keySender.getPrivate());
-            //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
+            boolean manInTheMiddleAttack = false;
+            PGPMessageHash pgpMessageHash;
+            if(!manInTheMiddleAttack)
+                pgpMessageHash = new PGPMessageHash(message, keySender.getPrivate());
+            else
+                pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
             PGPMessage pgpMessage = new PGPMessage(pgpMessageHash, keySymmetric, keyReceiver.getPublic());
 
             LoggerUtil.log(Level.FINE, "Encrypted PGP message: " + pgpMessage.getString());
