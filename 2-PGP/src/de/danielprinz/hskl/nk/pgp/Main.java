@@ -62,9 +62,6 @@ public class Main {
 
     public static void confidentiality(String message) {
         try {
-
-            KeyPair keySender = CryptoManager.getFreshKeyPair(1024);
-            KeyPair keyMitm = CryptoManager.getFreshKeyPair(1024);
             String keySymmetric = UUID.randomUUID().toString();
             KeyPair keyReceiver = CryptoManager.getFreshKeyPair(1024);
 
