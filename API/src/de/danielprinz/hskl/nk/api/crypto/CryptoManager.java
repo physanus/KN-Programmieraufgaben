@@ -153,7 +153,7 @@ public class CryptoManager {
     public static SecretKeySpec getAESKey(String key) throws NoSuchAlgorithmException {
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         keyBytes = Arrays.copyOf(MessageDigest.getInstance("SHA-1").digest(keyBytes), 16);
-        LoggerUtil.log(Level.INFO, "Calculated AES key from String [" + key + "]: " + Arrays.toString(keyBytes));
+        LoggerUtil.log(Level.INFO, "Calculated AES key from String [" + key + "]: " + encodeHex(keyBytes));
         return new SecretKeySpec(keyBytes, "AES");
     }
 
