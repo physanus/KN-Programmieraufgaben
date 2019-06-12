@@ -136,12 +136,12 @@ public class CryptoManager {
      * @return The generated key
      * @throws NoSuchAlgorithmException
      */
-    public static SecretKey getFreshDESKey() throws NoSuchAlgorithmException {
+    public static String getFreshDESKey() throws NoSuchAlgorithmException {
         LoggerUtil.log(Level.INFO, "Generating " + 56 + " bit long key, this could take a while...");
         KeyGenerator keyGen = KeyGenerator.getInstance("DES");
         keyGen.init(56, SECURE_RANDOM);
         LoggerUtil.log(Level.INFO, "Successfully generated the keypair.");
-        return keyGen.generateKey();
+        return encodeHex(keyGen.generateKey().getEncoded());
     }
 
     /**
@@ -225,10 +225,10 @@ public class CryptoManager {
         String md5Expected = CryptoManager.getMD5(s);
         String md5Decrypted = CryptoManager.decryptRSA(publicKey, sign, md5Expected.length());
 
-        // System.out.println("md5Expected: " + md5Expected);
-        // System.out.println("md5Expected.length(): " + md5Expected.length());
-        // System.out.println("md5Decrypted: " + md5Decrypted);
-        // System.out.println("md5Decrypted.length(): " + md5Decrypted.length());
+         System.out.println("md5Expected: " + md5Expected);
+         System.out.println("md5Expected.length(): " + md5Expected.length());
+         System.out.println("md5Decrypted: " + md5Decrypted);
+         System.out.println("md5Decrypted.length(): " + md5Decrypted.length());
 
         if(md5Decrypted.equals(md5Expected)) {
             LoggerUtil.log(Level.FINE, "Signature was verified");

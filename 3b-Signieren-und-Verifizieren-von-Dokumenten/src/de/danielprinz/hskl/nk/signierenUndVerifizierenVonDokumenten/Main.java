@@ -32,12 +32,13 @@ public class Main {
             String signature = alice.getSignature(document);
             System.out.println("signature: " + signature);
 
+            System.out.println("Public key alice cert: " + CryptoManager.encodeHex(aliceCert.getPublicKey().getEncoded()));
 
             // Validation of the document (authenticity & integrity)
-            System.out.println(CryptoManager.verifySignature(aliceCert.getPublicKey(), document, signature));
+            System.out.println("sig1: " + CryptoManager.verifySignature(aliceCert.getPublicKey(), document, signature));
 
             // Validation of the public key
-            System.out.println(aliceCert.verifyCert(cas));
+            System.out.println("sig2: " + aliceCert.verifyCert(cas));
 
 
 

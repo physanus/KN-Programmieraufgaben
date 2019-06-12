@@ -17,13 +17,13 @@ public class Cert {
     private String signatureAlgorithm;
     private String signature;
 
-    public Cert(String subject, String publicKeyAlgorithm, KeyPair keyPair, String issuer, String signatureAlgorithm) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
+    public Cert(String subject, String publicKeyAlgorithm, PrivateKey rootCAPrivateKey, PublicKey caPublicKey, String issuer, String signatureAlgorithm) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         this.subject = subject;
         this.publicKeyAlgorithm = publicKeyAlgorithm;
-        this.publicKey = keyPair.getPublic();
+        this.publicKey = caPublicKey;
         this.issuer = issuer;
         this.signatureAlgorithm = signatureAlgorithm;
-        this.signature = CryptoManager.getSignature(keyPair.getPrivate(), this.getString());
+        this.signature = CryptoManager.getSignature(rootCAPrivateKey, this.getString());
     }
 
 

@@ -33,7 +33,7 @@ public class CA {
      */
     public void generateCertificate(CA ca) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
         ca.rootCA = this;
-        ca.cert = new Cert(ca.name, "RSA/ECB/NoPadding", keyPair, name, "MD5withRSA");
+        ca.cert = new Cert(ca.name, "RSA/ECB/NoPadding", keyPair.getPrivate(), ca.keyPair.getPublic(), name, "MD5withRSA");
         LoggerUtil.log(Level.INFO, "Generated certificate: " + ca.cert);
     }
 
