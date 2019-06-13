@@ -227,16 +227,16 @@ public class CryptoManager {
         String md5Expected = CryptoManager.getMD5(s);
         String md5Decrypted = CryptoManager.decryptRSA(publicKey, sign, md5Expected.length());
 
-         System.out.println("md5Expected: " + md5Expected);
-         System.out.println("md5Expected.length(): " + md5Expected.length());
-         System.out.println("md5Decrypted: " + md5Decrypted);
-         System.out.println("md5Decrypted.length(): " + md5Decrypted.length());
+        // System.out.println("md5Expected: " + md5Expected);
+        // System.out.println("md5Expected.length(): " + md5Expected.length());
+        // System.out.println("md5Decrypted: " + md5Decrypted);
+        // System.out.println("md5Decrypted.length(): " + md5Decrypted.length());
 
         if(md5Decrypted.equals(md5Expected)) {
-            LoggerUtil.log(Level.FINE, "Signature was verified");
+            LoggerUtil.log(Level.INFO, "Signature was verified");
             return true;
         } else {
-            LoggerUtil.log(Level.FINE, "Signature was not verified");
+            LoggerUtil.log(Level.INFO, "Signature was not verified");
             return false;
         }
     }
