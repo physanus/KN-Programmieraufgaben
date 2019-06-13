@@ -18,6 +18,9 @@ public class Main {
 
         try {
 
+            // CREATE CERTIFICATES
+            LoggerUtil.log(Level.FINE, "Generating the certificates now");
+
             // layer root
             CA root = new CA("root");
             root.generateCertificate(root);
@@ -35,12 +38,12 @@ public class Main {
 
             CA member2 = new CA("member2");
             ca1.generateCertificate(member2);
-            // manipulate cert
+            // manipulate `member2` cert (==> it will not be genuine anymore)
             try {
                 Field f = Cert.class.getDeclaredField("issuer");
                 f.setAccessible(true);
                 f.set(member2.getCert(), "Fake Issuer");
-                LoggerUtil.log(Level.INFO, "Manipulated certificate: " + member2.getCert().toString());
+                LoggerUtil.log(Level.FINE, "Manipulated certificate: " + member2.getCert().toString());
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 e.printStackTrace();
             }
@@ -50,24 +53,29 @@ public class Main {
 
 
 
-            // Verify the certificates
+            // VERIFY THE CERTIFICATES
+            LoggerUtil.log(Level.FINE, "");
+            LoggerUtil.log(Level.FINE, "Validating the certificates now");
 
+            // is valid
             if(member1.verifyCert()) {
-                LoggerUtil.log(Level.INFO, "Signature of member1 is valid");
+                LoggerUtil.log(Level.FINE, "Signature of member1 is valid");
             } else {
-                LoggerUtil.log(Level.INFO, "Signature of member1 is invalid");
+                LoggerUtil.log(Level.FINE, "Signature of member1 is invalid");
             }
 
+            // is invalid
             if(member2.verifyCert()) {
-                LoggerUtil.log(Level.INFO, "Signature of member2 is valid");
+                LoggerUtil.log(Level.FINE, "Signature of member2 is valid");
             } else {
-                LoggerUtil.log(Level.INFO, "Signature of member2 is invalid");
+                LoggerUtil.log(Level.FINE, "Signature of member2 is invalid");
             }
 
+            // is valid
             if(member3.verifyCert()) {
-                LoggerUtil.log(Level.INFO, "Signature of member3 is valid");
+                LoggerUtil.log(Level.FINE, "Signature of member3 is valid");
             } else {
-                LoggerUtil.log(Level.INFO, "Signature of member3 is invalid");
+                LoggerUtil.log(Level.FINE, "Signature of member3 is invalid");
             }
 
 
