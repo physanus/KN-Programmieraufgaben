@@ -34,11 +34,14 @@ $ java -jar "1-RSA.jar"
 
 ```
 
-Encryption: ![Encryption](https://i.imgur.com/B2t1jAz.png)
+### Encryption
+![Encryption](https://i.imgur.com/B2t1jAz.png)
 
-Successful authentication: ![Successful authentication](https://i.imgur.com/mEE9vSr.png)
+### Successful authentication
+![Successful authentication](https://i.imgur.com/mEE9vSr.png)
 
-Failed authentication: ![Failed authentication](https://i.imgur.com/ijGejt3.png)
+### Failed authentication
+![Failed authentication](https://i.imgur.com/ijGejt3.png)
 
 
 ## 2-PGP
