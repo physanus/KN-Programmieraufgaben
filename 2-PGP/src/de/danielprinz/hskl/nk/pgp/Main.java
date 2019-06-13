@@ -35,9 +35,11 @@ public class Main {
     public static void authenticate(String message) {
         try {
 
+            // create keys for sender and MITM
             KeyPair keySender = CryptoManager.getFreshKeyPair(1024);
             KeyPair keyMitm = CryptoManager.getFreshKeyPair(1024);
 
+            // calculate message hash based on the respective keys
             boolean manInTheMiddleAttack = false;
             PGPMessageHash pgpMessageHash;
             if(!manInTheMiddleAttack)
@@ -47,7 +49,9 @@ public class Main {
 
             LoggerUtil.log(Level.FINE, "Encrypted PGP message: " + pgpMessageHash.getString());
 
-            // send pgpMessageHash.getString()
+            // send pgpMessageHash.getString() to the receiver
+
+            // authenticate the message
 
             String md5Decrypted = pgpMessageHash.getMD5Decrypted(keySender.getPublic());
             String md5Expected = CryptoManager.getMD5(pgpMessageHash.getMessage());
@@ -67,17 +71,21 @@ public class Main {
 
     public static void confidentiality(String message) {
         try {
+
+            // use a random UUID as the key for encrypting the message. This will later be converted to an AES key
             String keySymmetric = UUID.randomUUID().toString();
+            // get an asymmetric key pair for the receiver
             KeyPair keyReceiver = CryptoManager.getFreshKeyPair(1024);
 
+            // calculate the message hash
             PGPMessageHash pgpMessageHash = new PGPMessageHash(message);
-            //PGPMessageHash pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
             PGPMessage pgpMessage = new PGPMessage(pgpMessageHash, keySymmetric, keyReceiver.getPublic());
 
             LoggerUtil.log(Level.FINE, "Encrypted PGP message: " + pgpMessage.getString());
 
-            // send pgpMessage.getString()
+            // send pgpMessage.getString() to the receiver
 
+            // decrypt the message using the provided key
             PGPMessageHash pgpMessageHashDecrypted = PGPMessage.getPGPMessage(pgpMessage.getString(), keyReceiver.getPrivate());
             LoggerUtil.log(Level.FINE, "Decrypted PGP message: " + pgpMessageHashDecrypted.getString());
 
@@ -90,25 +98,35 @@ public class Main {
     public static void fullPGP(String message) {
         try {
 
+            // create keys for sender and MITM
             KeyPair keySender = CryptoManager.getFreshKeyPair(1024);
             KeyPair keyMitm = CryptoManager.getFreshKeyPair(1024);
+            // use a random UUID as the key for encrypting the message. This will later be converted to an AES key
             String keySymmetric = UUID.randomUUID().toString();
+            // get an asymmetric key pair for the receiver
             KeyPair keyReceiver = CryptoManager.getFreshKeyPair(1024);
 
+            // calculate message hash based on the respective keys
             boolean manInTheMiddleAttack = false;
             PGPMessageHash pgpMessageHash;
             if(!manInTheMiddleAttack)
                 pgpMessageHash = new PGPMessageHash(message, keySender.getPrivate());
             else
                 pgpMessageHash = new PGPMessageHash(message, keyMitm.getPrivate());
+
+            // calculate the message hash
             PGPMessage pgpMessage = new PGPMessage(pgpMessageHash, keySymmetric, keyReceiver.getPublic());
 
             LoggerUtil.log(Level.FINE, "Encrypted PGP message: " + pgpMessage.getString());
 
-            // send pgpMessage.getString()
+            // send pgpMessage.getString() to the receiver
 
+            // decrypt the message using the provided key
             PGPMessageHash pgpMessageHashDecrypted = PGPMessage.getPGPMessage(pgpMessage.getString(), keyReceiver.getPrivate());
             LoggerUtil.log(Level.FINE, "Decrypted PGP message: " + pgpMessageHashDecrypted.getMessage());
+
+            // authenticate the message
+            
             String md5Decrypted = pgpMessageHashDecrypted.getMD5Decrypted(keySender.getPublic());
             String md5Expected = CryptoManager.getMD5(pgpMessageHashDecrypted.getMessage());
 
