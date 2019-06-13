@@ -77,9 +77,9 @@ public class Cert {
         return "Cert{" +
                 "subject='" + subject + '\'' +
                 ", publicKeyAlgorithm='" + publicKeyAlgorithm + '\'' +
-                ", publicKey=" + CryptoManager.encodeHex(publicKey.getEncoded()) +
                 ", issuer='" + issuer + '\'' +
                 ", signatureAlgorithm='" + signatureAlgorithm + '\'' +
+                ", publicKey=" + CryptoManager.encodeHex(publicKey.getEncoded()) +
                 '}';
     }
 
@@ -88,9 +88,9 @@ public class Cert {
         return "Cert{" +
                 "subject='" + subject + '\'' +
                 ", publicKeyAlgorithm='" + publicKeyAlgorithm + '\'' +
-                ", publicKey=" + CryptoManager.encodeHex(publicKey.getEncoded()) +
                 ", issuer='" + issuer + '\'' +
                 ", signatureAlgorithm='" + signatureAlgorithm + '\'' +
+                ", publicKey=" + CryptoManager.encodeHex(publicKey.getEncoded()) +
                 ", signature=" + signature +
                 '}';
     }
