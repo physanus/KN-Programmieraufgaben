@@ -141,7 +141,7 @@ public class Main extends Application {
 
                         // decrypt
                         String decryptedEncryption = CryptoManager.decryptRSA(keyPairReceiver.getPrivate(), encryptedEncryption);
-                        LoggerUtil.log(Level.INFO, "decryptedEncryption: " + decryptedEncryption + "\n");
+                        LoggerUtil.log(Level.INFO, "decryptedEncryption: " + decryptedEncryption);
                         textFields.get(4).setText(decryptedEncryption);
 
 
@@ -177,7 +177,7 @@ public class Main extends Application {
                         textFields.get(3).setText(encryptedAuthentication);
 
                         String decryptedAuthentication = CryptoManager.decryptRSA(keyPairSender.getPublic(), encryptedAuthentication);
-                        LoggerUtil.log(Level.INFO, "decryptedAuthentication: " + decryptedAuthentication + "\n");
+                        LoggerUtil.log(Level.INFO, "decryptedAuthentication: " + decryptedAuthentication);
                         textFields.get(4).setText(decryptedAuthentication);
 
                         AlertBox.display("Info",

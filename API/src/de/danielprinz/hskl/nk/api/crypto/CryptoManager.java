@@ -168,6 +168,8 @@ public class CryptoManager {
         byte[] keyPublic = decodeHex(keyString.split(", ")[0]);
         byte[] keyPrivate = decodeHex(keyString.split(", ")[1]);
 
+        // add empty line in front
+        LoggerUtil.log(Level.INFO, "");
         LoggerUtil.log(Level.INFO,"Found public key: " + encodeHex(keyPublic));
         LoggerUtil.log(Level.INFO,"Found private key: " + encodeHex(keyPrivate));
 
