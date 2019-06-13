@@ -155,7 +155,7 @@ $ java -jar "3a-Public-Key-Infrastructure.jar"
 
 ```
 
-##3b-Signieren-und-Verifizieren-von-Dokumenten
+## 3b-Signieren-und-Verifizieren-von-Dokumenten
 Run with `java -jar "3b-Signieren und Verifizieren von Dokumenten.jar"`
 
 ### Example output
