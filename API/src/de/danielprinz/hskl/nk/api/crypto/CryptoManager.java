@@ -168,8 +168,8 @@ public class CryptoManager {
         byte[] keyPublic = decodeHex(keyString.split(", ")[0]);
         byte[] keyPrivate = decodeHex(keyString.split(", ")[1]);
 
-        LoggerUtil.log(Level.INFO,"Found public key bytes: " + Arrays.toString(keyPublic));
-        LoggerUtil.log(Level.INFO,"Found private key bytes: " + Arrays.toString(keyPrivate));
+        LoggerUtil.log(Level.INFO,"Found public key: " + encodeHex(keyPublic));
+        LoggerUtil.log(Level.INFO,"Found private key: " + encodeHex(keyPrivate));
 
         // convert bytes to keys
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
