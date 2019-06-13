@@ -20,15 +20,16 @@ public class Main {
 
         LoggerUtil.log(Level.FINE, "Authentication");
         authenticate("This is a secret message");
+
+        LoggerUtil.log(Level.FINE, "");
         LoggerUtil.log(Level.FINE, "Confidentiality");
         confidentiality("This is a secret message");
+
+        LoggerUtil.log(Level.FINE, "");
         LoggerUtil.log(Level.FINE, "Full PGP");
         fullPGP("This is a secret message");
 
     }
-
-
-
 
 
     public static void authenticate(String message) {

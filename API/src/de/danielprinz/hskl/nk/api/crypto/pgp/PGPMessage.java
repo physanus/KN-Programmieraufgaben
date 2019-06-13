@@ -15,7 +15,7 @@ import java.security.PublicKey;
  */
 public class PGPMessage {
 
-    static final String SPLIT_STRING = ";.,;";
+    static final String SPLIT_STRING = ";";
 
     private String pgpMessageHashString;
     private String keySymmetricEncrypted;
