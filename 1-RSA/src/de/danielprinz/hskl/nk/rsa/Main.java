@@ -38,9 +38,7 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-
         LoggerUtil.setPrefix("1-RSA");
-
         launch(args);
     }
 
@@ -145,7 +143,7 @@ public class Main extends Application {
                         textFields.get(4).setText(decryptedEncryption);
 
 
-                    } catch (ArrayIndexOutOfBoundsException | NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e1) {
+                    } catch (ArrayIndexOutOfBoundsException | NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NumberFormatException e1) {
                         e1.printStackTrace();
                         AlertBox.display("Error", "One of the keys seems to be broken.\nPlease, check their correctness!");
                     }
@@ -185,7 +183,7 @@ public class Main extends Application {
                         );
 
 
-                    } catch (NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException e1) {
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | InvalidKeyException | NumberFormatException e1) {
                         e1.printStackTrace();
                         AlertBox.display("Error", "One of the keys seems to be broken.\nPlease, check their correctness!");
                     }
