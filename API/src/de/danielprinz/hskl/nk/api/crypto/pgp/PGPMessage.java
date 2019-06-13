@@ -28,6 +28,17 @@ public class PGPMessage {
     }
 
 
+    /**
+     * Creates a PGPMessageHash object from its string representation
+     * @param pgpMessage The message / string representation
+     * @param privateKey the private key used to encrypt the symmetric key
+     * @return The PGPMessageHash object
+     * @throws IllegalBlockSizeException
+     * @throws InvalidKeyException
+     * @throws BadPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     */
     public static PGPMessageHash getPGPMessage(String pgpMessage, PrivateKey privateKey) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {
         String[] pgpMessageSplit = pgpMessage.split(SPLIT_STRING);
         String keySymmetricDecrypted = CryptoManager.decryptRSA(privateKey, pgpMessageSplit[1], 36);
