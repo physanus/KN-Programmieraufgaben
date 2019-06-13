@@ -18,7 +18,7 @@ public class Main {
 
         try {
 
-            // CREATE CERTIFICATES
+            // GENERATE CERTIFICATES
             LoggerUtil.log(Level.FINE, "Generating the certificates now");
 
             // layer root
