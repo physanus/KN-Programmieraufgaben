@@ -122,6 +122,8 @@ public class Main extends Application {
 
             if (i == 2) {
 
+                // Encrypt and then decrypt the given text using the provided key
+
                 Button encryptButton = new Button("Encrypt");
                 encryptButton.setPrefWidth(145);
                 GridPane.setConstraints(encryptButton, 2, i);
@@ -160,15 +162,17 @@ public class Main extends Application {
 
                 authenticateButton.setOnAction(e -> {
 
+                    // Authenticate the given text using the provided key with a 50 % chance of failure / 50 % chance of success
+
                     try {
 
                         KeyPair keyPairSender = CryptoManager.getKeysFromString(textFields.get(0).getText());
-                        KeyPair keyPairReceiver = CryptoManager.getKeysFromString(textFields.get(1).getText());
 
                         // randomize whether the authentication should be successful or not (MITM-Attack)
                         boolean correctAuthentication = ThreadLocalRandom.current().nextBoolean();
 
-                        String encryptedAuthentication = CryptoManager.encryptRSA(correctAuthentication ? keyPairSender.getPrivate() : keyPairReceiver.getPrivate(), textFields.get(2).getText());
+                        // create key from mitm-attack-key in case we do not want correct authentication
+                        String encryptedAuthentication = CryptoManager.encryptRSA(correctAuthentication ? keyPairSender.getPrivate() : CryptoManager.getFreshKeyPair(1024).getPrivate(), textFields.get(2).getText());
                         LoggerUtil.log(Level.INFO, "encryptedAuthentication: " + encryptedAuthentication);
                         textFields.get(3).setText(encryptedAuthentication);
 
@@ -207,6 +211,8 @@ public class Main extends Application {
             int finalI1 = i;
             importButton.setOnAction(e -> {
 
+                // ask user for file and read it
+
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle(finalTitle);
                 fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
@@ -224,6 +230,7 @@ public class Main extends Application {
                 try {
                     String keyString = new String(Files.readAllBytes(Paths.get(selectedFile.getAbsolutePath())));
                     try {
+                        // try to convert the string to a valid keypair
                         CryptoManager.getKeysFromString(keyString);
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException e1) {
                         AlertBox.display("Error", "The key is invalid");
