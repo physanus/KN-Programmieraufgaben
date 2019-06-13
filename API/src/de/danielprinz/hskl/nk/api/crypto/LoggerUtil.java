@@ -23,10 +23,13 @@ public class LoggerUtil {
         this.logger = Logger.getLogger(this.prefix);
 
         // set up the logger
+
+        // remove previous handlers
         for(Handler handler : this.logger.getParent().getHandlers()) {
             this.logger.getParent().removeHandler(handler);
         }
 
+        // define own handler
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setFormatter(new Formatter() {
             @Override
@@ -44,6 +47,8 @@ public class LoggerUtil {
                 return color + "[" + prefix + "] [" + record.getLevel().getName() + "] " + record.getMessage() + ANSI_RESET + "\n";
             }
         });
+
+        // log all levels by default
         consoleHandler.setLevel(Level.ALL);
         this.logger.addHandler(consoleHandler);
         this.logger.setLevel(Level.ALL);

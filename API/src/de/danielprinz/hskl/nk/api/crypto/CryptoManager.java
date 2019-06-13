@@ -210,27 +210,29 @@ public class CryptoManager {
      * @throws IllegalBlockSizeException
      */
     public static String getSignature(PrivateKey privateKey, String s) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
-        // Signature signature = Signature.getInstance("MD5withRSA");
-        // signature.initSign(privateKey);
-        // signature.update(s.getBytes(StandardCharsets.UTF_8));
-        // return encodeHex(signature.sign());
-
         return new PGPMessageHash(s, privateKey).getMd5Encrypted();
     }
 
+    /**
+     * Verifies the provided signature for a string
+     * @param publicKey The public key to decrypt the signature
+     * @param s The string
+     * @param sign The signature
+     * @return true: validated, false: not validated
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws NoSuchPaddingException
+     * @throws BadPaddingException
+     * @throws IllegalBlockSizeException
+     */
     public static boolean verifySignature(PublicKey publicKey, String s, String sign) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException {
-        // Signature signature = Signature.getInstance("MD5withRSA");
-        // signature.initVerify(publicKey);
-        // signature.update(s.getBytes(StandardCharsets.UTF_8));
-        // return signature.verify(decodeHex(sign));
-
         String md5Expected = CryptoManager.getMD5(s);
         String md5Decrypted = CryptoManager.decryptRSA(publicKey, sign, md5Expected.length());
 
-        // System.out.println("md5Expected: " + md5Expected);
-        // System.out.println("md5Expected.length(): " + md5Expected.length());
-        // System.out.println("md5Decrypted: " + md5Decrypted);
-        // System.out.println("md5Decrypted.length(): " + md5Decrypted.length());
+        LoggerUtil.log(Level.INFO, "md5Expected: " + md5Expected);
+        LoggerUtil.log(Level.INFO, "md5Expected.length(): " + md5Expected.length());
+        LoggerUtil.log(Level.INFO, "md5Decrypted: " + md5Decrypted);
+        LoggerUtil.log(Level.INFO, "md5Decrypted.length(): " + md5Decrypted.length());
 
         if(md5Decrypted.equals(md5Expected)) {
             LoggerUtil.log(Level.INFO, "Signature was verified");
